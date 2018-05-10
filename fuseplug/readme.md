@@ -9,6 +9,6 @@
 ### instructions
 * clone the fuseplug environment
 * cd to the project dir and run `composer install`
-* install rabbitmq.  I ran `brew install rabbitmq`
-* set up rabbitmq to start at login: `brew services start rabbitmq`
+* install and set up rabbitmq.  Here's what I used: https://www.rabbitmq.com/install-homebrew.html
+* do yourself a favor and install the rabbitmq admin interface.  You can query rabbitmq for whatever you need with the command line but this is a nice web ui for seeing what's happening.  More info here: https://www.rabbitmq.com/management.html
 
