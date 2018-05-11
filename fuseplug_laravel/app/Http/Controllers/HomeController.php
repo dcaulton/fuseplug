@@ -15,11 +15,26 @@ class HomeController extends Controller
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     public function call(Request $request)
     {
-        return Response::json('im surprised to hear that', 200);
+        return Response::json('you just made a call', 200);
+    }
+    public function callStatus(Request $request)
+    {
+        return Response::json('the status of your call', 200);
+    }
+    public function callData(Request $request)
+    {
+        return Response::json('the data from your call', 200);
+    }
+    public function appStatus(Request $request)
+    {
+        return Response::json('dashboard type info on fuseplug', 200);
     }
     public function appApiDoc(Request $request)
     {
-        dd('mamasita');
-        return Response::json('oh really', 200);
+        return Response::json('this is the documentation for the fuseplug api endpoints', 200);
+    }
+    public function brandInterfaceDoc(Request $request)
+    {
+        return Response::json('all data on all configured brand partner integrations', 200);
     }
 }

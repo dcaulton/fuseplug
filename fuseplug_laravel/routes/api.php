@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\HomeController;
+//use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +17,10 @@ use App\Http\Controllers\HomeController;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('/call', 'HomeController@call');
-Route::get('/call-status', 'HomeController@callStatus');
-Route::get('/call-data', 'HomeController@callData');
-Route::get('/app-status', 'HomeController@appStatus');
-Route::get('/app-api-doc', 'HomeController@appApiDoc');
-Route::get('/brand-interface-doc', 'HomeController@brandInterfaceDoc');
+//Route::get('call', 'HomeController@call');
+//Route::get('call-status', 'HomeController@callStatus');
+//Route::get('call-data', 'HomeController@callData');
+//Route::get('app-status', 'HomeController@appStatus');
+//Route::get('app-api-doc', function() {return 'MAMA MIA';});
+//Route::get('/app-api-doc', 'HomeController@appApiDoc');
+//Route::get('brand-interface-doc', 'HomeController@brandInterfaceDoc');

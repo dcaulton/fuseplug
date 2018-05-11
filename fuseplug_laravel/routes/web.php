@@ -14,3 +14,9 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::post('call', 'HomeController@call');
+Route::get('call-status', 'HomeController@callStatus');
+Route::get('call-data', 'HomeController@callData');
+Route::get('app-status', 'HomeController@appStatus');
+Route::get('/app-api-doc', 'HomeController@appApiDoc');
+Route::get('brand-interfaces-doc', 'HomeController@brandInterfaceDoc');
