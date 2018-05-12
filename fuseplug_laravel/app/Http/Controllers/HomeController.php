@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Operation;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -44,6 +46,8 @@ class HomeController extends Controller
     }
     public function brandInterfaceDoc(Request $request)
     {
-        return Response::json('all data on all configured brand partner integrations', 200);
+        $return_data = ['Brands'=>[]];;
+        $brands = Brand::with('Operations')->get();
+        return Response::json($brands, 200);
     }
 }
