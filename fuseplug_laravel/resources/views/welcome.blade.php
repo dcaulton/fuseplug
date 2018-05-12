@@ -85,7 +85,7 @@
                 <div class="links">
                     <a href="https://github.com/dcaulton/fuseplug">Github</a>
                     <a href="./app-api-doc">API Doc</a>
-                    <a href="./brand-interfaces-doc">Brand Interfaces</a>
+                    <a href="./brand-interfaces-doc">Brands and Operations</a>
                 </div>
             </div>
         </div>
