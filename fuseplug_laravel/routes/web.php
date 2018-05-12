@@ -14,9 +14,10 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::post('call', 'HomeController@call');
-Route::get('call-status', 'HomeController@callStatus');
-Route::get('call-data', 'HomeController@callData');
+Route::post('call', 'HomeController@createCall');
+Route::get('call', 'HomeController@listCalls');
+Route::get('call/{id}', 'HomeController@getCall');
+Route::get('callback', 'HomeController@callback');
 Route::get('app-status', 'HomeController@appStatus');
-Route::get('/app-api-doc', 'HomeController@appApiDoc');
+Route::get('app-api-doc', 'HomeController@appApiDoc');
 Route::get('brand-interfaces-doc', 'HomeController@brandInterfaceDoc');

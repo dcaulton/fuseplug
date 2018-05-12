@@ -13,17 +13,26 @@ use Response;
 class HomeController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    public function call(Request $request)
+    public function createCall(Request $request)
     {
         return Response::json('you just made a call', 200);
     }
-    public function callStatus(Request $request)
+    public function getCall(Request $request, $call_id)
     {
         return Response::json('the status of your call', 200);
     }
-    public function callData(Request $request)
+    public function listCalls(Request $request)
     {
-        return Response::json('the data from your call', 200);
+        return Response::json('listing all calls', 200);
+    }
+
+    // This is a hack.  It does the same thing as a post to createCall
+    // It's needed because I'm sure some brand will have a problem creating a POST call
+    //   as our operation architecture will require
+    public function callback(Request $request)
+    {
+  
+        return Response::json('you just made a call', 200);
     }
     public function appStatus(Request $request)
     {
