@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Operation;
+use App\Models\OperationRule;
+use App\Models\OperationAction;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -47,7 +49,26 @@ class HomeController extends Controller
     public function brandInterfaceDoc(Request $request)
     {
         $return_data = ['Brands'=>[]];;
-        $brands = Brand::with('Operations')->get();
+//        $brands = Brand::with('Operations')->with('OperationRules')->get();
+        $brands = json_decode(Brand::all());
+        foreach ($brands as $brand) {
+            $operations = json_decode(Operation::where('brand_id', $brand->id)->get());
+            $brand->operations = Array();
+            foreach ($operations as $operation) {
+                $operation_rules = json_decode(OperationRule::where('operation_id', $operation->id)->get());
+                $operation->operation_rules = Array();
+                foreach ($operation_rules as $operation_rule) {
+   
+                    $operation_actions = json_decode(OperationAction::where('operation_rule_id', $operation_rule->id)->get());
+                    $operation_rule->operation_actions = Array();
+                    foreach ($operation_actions as $operation_action) {
+                        array_push($operation_rule->operation_actions, $operation_action);
+                    }
+                    array_push($operation->operation_rules, $operation_rule);
+                }
+                array_push($brand->operations, $operation);
+            }
+        }
         return Response::json($brands, 200);
     }
 }
