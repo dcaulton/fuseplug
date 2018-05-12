@@ -19,11 +19,11 @@ class CreateOperationRulesTable extends Migration
             $table->string('brand_version');
             $table->string('fuse_version');
             $table->integer('order');
-            $table->integer('acting_on');
+            $table->string('acting_on');
             $table->boolean('do_always')->default(false);
-            $table->integer('input_selector');
-            $table->integer('operator');
-            $table->integer('allowed_value');
+            $table->string('input_selector');
+            $table->string('operator');
+            $table->string('allowed_value');
             $table->timestamps();
 
             $table->foreign('operation_id')->references('id')->on('operations');
