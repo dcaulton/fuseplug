@@ -31,18 +31,17 @@ function gen_uuid() {
 
 class SuperCall extends Model
 {
-    //
-    public static function create($data) {
+    public static function create($data, $operation_id) {
         $super_call = new SuperCall;
-//        $super_call->id = gen_uuid();
-        $super_call->operation_id = $data['operation_id'];
+        $super_call->operation_id = $operation_id;
         $super_call->initial_payload = json_encode($data);
-        $x = $super_call->save();
+        if (!$super_call->save()) {
+            throw new \Exception('error creating supercall');
+        }
         return $super_call->id;
     }
 
     public function get_summary() {
-        // return a summary of all calls 
         $return_data = Array();
         $this_as_json = json_decode($this);
         $this_as_json->calls = Array();

@@ -19,7 +19,6 @@ class CreateDataMappingsTable extends Migration
             $table->string('brand_versions');
             $table->string('fuse_versions');
             $table->string('template');
-            $table->timestamps();
 
             $table->foreign('operation_action_id')->references('id')->on('operation_actions');
         });

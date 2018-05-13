@@ -25,7 +25,6 @@ class CreateOperationActionsTable extends Migration
             $table->string('brand_url');
             $table->string('fuse_url');
             $table->string('http_verb');
-            $table->timestamps();
 
             $table->foreign('operation_rule_id')->references('id')->on('operation_rules');
         });
