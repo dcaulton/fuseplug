@@ -29,7 +29,9 @@ class HomeController extends Controller
     }
     public function getCall(Request $request, $call_id)
     {
-        return Response::json('the status of your call', 200);
+        $super_call = SuperCall::findOrFail($call_id);
+        $return_data = $super_call->get_summary();
+        return Response::json($return_data, 200);
     }
     public function listCalls(Request $request)
     {
