@@ -64,14 +64,14 @@ return [
             'retry_after' => 90,
             'block_for' => null,
         ],
-        'rabbitmq' => [
-            'driver' => 'rabbitmq',
-'queue'=>'fuseplug',
-'host'=>'127.0.0.1',
-'port'=>'5672',
-'login'=>'guest',
-'password'=>'guest',
-        ],
+//        'xrabbitmq' => [
+//            'xdriver' => 'rabbitmq',
+//            'xqueue'=>'fuseplug',
+//            'xhost'=>'127.0.0.1',
+//            'xport'=>'5672',
+//            'xlogin'=>'guest',
+//            'xpassword'=>'guest',
+//        ],
 
     ],
 

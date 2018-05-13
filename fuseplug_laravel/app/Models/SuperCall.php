@@ -35,6 +35,7 @@ class SuperCall extends Model
         $super_call = new SuperCall;
         $super_call->operation_id = $operation_id;
         $super_call->initial_payload = json_encode($data);
+        $super_call->status = 'ACTIVE';
         if (!$super_call->save()) {
             throw new \Exception('error creating supercall');
         }
