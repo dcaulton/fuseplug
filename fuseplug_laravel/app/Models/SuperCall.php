@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Call;
 use Illuminate\Database\Eloquent\Model;
 use Uuid;
 
@@ -38,5 +39,18 @@ class SuperCall extends Model
         $super_call->initial_payload = json_encode($data);
         $x = $super_call->save();
         return $super_call->id;
+    }
+
+    public function get_summary() {
+        // return a summary of all calls 
+        $return_data = Array();
+        $this_as_json = json_decode($this);
+        $this_as_json->calls = Array();
+        $calls = Call::where('super_call_id', $this->id)->orderBy('updated_at')->get();
+        foreach ($calls as $call) {
+            array_push($this_as_json, json_decode($call));
+        }
+        array_push($return_data, $this_as_json);
+        return $return_data;
     }
 }
