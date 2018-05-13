@@ -41,7 +41,24 @@ class HttpGet implements ShouldQueue
             $from = rawurlencode($initial_payload_array['from']);
         }
         $target_url .= $from;
-        
-        echo('calling ' . $target_url . ' soon');
+        try {
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $target_url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+				"Content-Type: application/json",
+				"Accept: application/json" 
+			));
+			$data = curl_exec($ch);
+			curl_close($ch);
+			$super_call->final_response = $data;
+			$super_call->status = 'COMPLETE';
+			$super_call->save();
+        } catch (\Exception $e) {
+            echo "caught exception in HttpGet: " . $e->getMessage() . "\n";
+			$super_call->status = 'FAILED';
+			$super_call->save();
+        }
     }
 }

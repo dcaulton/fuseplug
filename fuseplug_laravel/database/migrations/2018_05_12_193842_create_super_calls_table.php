@@ -17,6 +17,8 @@ class CreateSuperCallsTable extends Migration
             $table->increments('id');
             $table->integer('operation_id')->unsigned();
             $table->string('initial_payload');
+            $table->string('final_response')->nullable();
+            $table->string('status');
             $table->timestamps();
 
             $table->foreign('operation_id')->references('id')->on('operations');
