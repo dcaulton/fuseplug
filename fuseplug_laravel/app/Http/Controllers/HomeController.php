@@ -12,6 +12,8 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
+use App\Jobs\HttpGet;
+
 use Illuminate\Http\Request;
 use Response;
 
@@ -25,6 +27,10 @@ class HomeController extends Controller
         $operation = Operation::where('brand_id', $brand->id)->where('name', $request->input('name', 'credit_check'))->first();
         if (!isset($operation)) { return Response::json('invalid operation specified', 422); }
         $super_call_id = SuperCall::create($request->all(), $operation->id);
+        // put something on the dispatch queue
+        HttpGet::dispatch($super_call_id)->onQueue('fuseplug')->onConnection('rabbitmq')
+            ->delay(now()->addMinutes(1));
+
         return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }
     public function getCall(Request $request, $call_id)
@@ -50,6 +56,8 @@ class HomeController extends Controller
     public function appStatus(Request $request)
     {   
         $status_obj = ["uptime" => "54 days",
+            "software_branch"=> "release.0.0.65",
+            "software_commit_hash"=> "a9604030d2cfbf792dbd078b71d3979eec737b1c",
             "overall_status" => "great",
             "cronjobs" => "22",
             "operations" => 35];
