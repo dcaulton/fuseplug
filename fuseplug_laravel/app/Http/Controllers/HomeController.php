@@ -25,7 +25,7 @@ class HomeController extends Controller
         $operation = Operation::where('brand_id', $brand->id)->where('name', $request->input('name', 'credit_check'))->first();
         if (!isset($operation)) { return Response::json('invalid operation specified', 422); }
         $super_call_id = SuperCall::create($request->all()+['operation_id' => $operation->id]);
-        return Response::json($super_call_id, 200);
+        return Response::json($super_call_id, 201);
     }
     public function getCall(Request $request, $call_id)
     {
@@ -62,7 +62,25 @@ class HomeController extends Controller
     }
     public function appApiDoc(Request $request)
     {
-        return Response::json('this is the documentation for the fuseplug api endpoints', 200);
+        $endpoints = [
+            '/call'=> [
+                'POST' => "how to initially request a call.  See /brand-interfaces-doc for details on your specific brand and service.",
+                'GET' => 'list all active calls'
+            ],
+            '/call/{call id}'=> [
+                'GET' => "check on the status of a call.  Will supply data or a url to the data if it is ready."
+            ],
+            '/app-status'=> [
+                'GET' => "check on the status of the system.  Will list status and any known issues with your brands and services"
+            ],
+            '/app-api-doc'=> [
+                'GET' => "You are here.  Documentation on the fuseplug application"
+            ],
+            '/brand-interfaces-doc'=> [
+                'GET' => "gets detailed information on the brands and services available to you"
+            ],
+        ];
+        return Response::json($endpoints, 200);
     }
     public function brandInterfaceDoc(Request $request)
     {
