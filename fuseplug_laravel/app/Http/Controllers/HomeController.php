@@ -27,9 +27,12 @@ class HomeController extends Controller
         $operation = Operation::where('brand_id', $brand->id)->where('name', $request->input('name', 'credit_check'))->first();
         if (!isset($operation)) { return Response::json('invalid operation specified', 422); }
         $super_call_id = SuperCall::create($request->all(), $operation->id);
-        // put something on the dispatch queue
-        HttpGet::dispatch($super_call_id)->onQueue('fuseplug')->onConnection('rabbitmq')
-            ->delay(now()->addMinutes(1));
+        HttpGet::dispatch($super_call_id)->onQueue('fuseplug')->onConnection('rabbitmq');
+//$sc = SuperCall::find($super_call_id);
+//print_r($sc);
+//HttpGet::dispatch($sc)->onQueue('fuseplug')->onConnection('rabbitmq');
+//        HttpGet::dispatch($super_call_id)->onQueue('fuseplug')->onConnection('rabbitmq')
+//            ->delay(now()->addMinutes(1));
 
         return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }
