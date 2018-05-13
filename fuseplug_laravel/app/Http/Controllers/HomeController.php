@@ -35,7 +35,8 @@ class HomeController extends Controller
     }
     public function listCalls(Request $request)
     {
-        return Response::json('listing all calls', 200);
+        $super_calls = SuperCall::all();
+        return Response::json($super_calls, 200);
     }
 
     // This is a hack.  It does the same thing as a post to createCall
@@ -47,8 +48,17 @@ class HomeController extends Controller
         return Response::json('you just made a call', 200);
     }
     public function appStatus(Request $request)
-    {
-        return Response::json('dashboard type info on fuseplug', 200);
+    {   
+        $status_obj = ["uptime" => "54 days",
+            "overall_status" => "great",
+            "cronjobs" => "22",
+            "operations" => 35];
+        $status_obj['brands'] = [];
+        $brands = Brand::all();
+        foreach ($brands as $brand) {
+            $status_obj['brands'][$brand->name] = $brand->get_status_object();
+        }
+        return Response::json($status_obj, 200);
     }
     public function appApiDoc(Request $request)
     {
@@ -57,7 +67,6 @@ class HomeController extends Controller
     public function brandInterfaceDoc(Request $request)
     {
         $return_data = ['Brands'=>[]];;
-//        $brands = Brand::with('Operations')->with('OperationRules')->get();
         $brands = json_decode(Brand::all());
         foreach ($brands as $brand) {
             $operations = json_decode(Operation::where('brand_id', $brand->id)->get());
