@@ -24,8 +24,8 @@ class HomeController extends Controller
         if (!isset($brand)) { return Response::json('invalid brand specified', 422); }
         $operation = Operation::where('brand_id', $brand->id)->where('name', $request->input('name', 'credit_check'))->first();
         if (!isset($operation)) { return Response::json('invalid operation specified', 422); }
-        $super_call_id = SuperCall::create($request->all()+['operation_id' => $operation->id]);
-        return Response::json($super_call_id, 201);
+        $super_call_id = SuperCall::create($request->all(), $operation->id);
+        return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }
     public function getCall(Request $request, $call_id)
     {

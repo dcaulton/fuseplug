@@ -32,12 +32,15 @@ function gen_uuid() {
 class SuperCall extends Model
 {
     //
-    public static function create($data) {
+    public static function create($data, $operation_id) {
         $super_call = new SuperCall;
 //        $super_call->id = gen_uuid();
-        $super_call->operation_id = $data['operation_id'];
+        $super_call->operation_id = $operation_id;
         $super_call->initial_payload = json_encode($data);
-        $x = $super_call->save();
+//        $super_call->initial_payload = $data;
+        if (!$super_call->save()) {
+            throw new \Exception('error creating supercall');
+        }
         return $super_call->id;
     }
 

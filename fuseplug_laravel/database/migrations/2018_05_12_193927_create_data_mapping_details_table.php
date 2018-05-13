@@ -23,7 +23,6 @@ class CreateDataMappingDetailsTable extends Migration
             $table->integer('target_data_type');
             $table->integer('target_format_string');
             $table->integer('transform');
-            $table->timestamps();
 
             $table->foreign('data_mapping_id')->references('id')->on('data_mappings');
         });

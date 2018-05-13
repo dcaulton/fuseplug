@@ -24,7 +24,6 @@ class CreateOperationRulesTable extends Migration
             $table->string('input_selector');
             $table->string('operator');
             $table->string('allowed_value');
-            $table->timestamps();
 
             $table->foreign('operation_id')->references('id')->on('operations');
         });

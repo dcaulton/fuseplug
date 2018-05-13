@@ -17,7 +17,6 @@ class CreateOperationsTable extends Migration
             $table->increments('id');
             $table->integer('brand_id')->unsigned();
             $table->string('name')->unique();
-            $table->timestamps();
 
             $table->foreign('brand_id')->references('id')->on('brands');
         });
