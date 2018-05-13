@@ -16,7 +16,7 @@ class CreateCallsTable extends Migration
         Schema::create('calls', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('operation_action_id')->unsigned();
-            $table->uuid('super_call_id');
+            $table->integer('super_call_id')->unsigned();
             $table->integer('request_data')->unsigned();
             $table->string('response_data');
             $table->string('error_messages');

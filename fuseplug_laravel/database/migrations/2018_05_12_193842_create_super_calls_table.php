@@ -14,12 +14,11 @@ class CreateSuperCallsTable extends Migration
     public function up()
     {
         Schema::create('super_calls', function (Blueprint $table) {
-            $table->uuid('id');
+            $table->increments('id');
             $table->integer('operation_id')->unsigned();
             $table->string('initial_payload');
             $table->timestamps();
 
-            $table->primary('id');
             $table->foreign('operation_id')->references('id')->on('operations');
         });
     }

@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Operation;
 use App\Models\OperationRule;
 use App\Models\OperationAction;
+use App\Models\SuperCall;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -19,7 +20,12 @@ class HomeController extends Controller
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     public function createCall(Request $request)
     {
-        return Response::json('you just made a call', 200);
+        $brand = Brand::where('name', $request->input('brand_name', 'test_brand'))->first();
+        if (!isset($brand)) { return Response::json('invalid brand specified', 422); }
+        $operation = Operation::where('brand_id', $brand->id)->where('name', $request->input('name', 'credit_check'))->first();
+        if (!isset($operation)) { return Response::json('invalid operation specified', 422); }
+        $super_call_id = SuperCall::create($request->all()+['operation_id' => $operation->id]);
+        return Response::json($super_call_id, 200);
     }
     public function getCall(Request $request, $call_id)
     {
