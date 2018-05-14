@@ -16,7 +16,8 @@ class OperationsSeeder extends Seeder
         $brand = DB::table('brands')->get()[0];
         DB::table('operations')->insert([
             'brand_id' => $brand->id,
-            'name' => 'credit_check'
+            'name' => 'credit_check',
+            'queue' => 'fuseplug_laravel'
         ]);
         $operation = DB::table('operations')->get()[0];
 

@@ -26,8 +26,12 @@ class HomeController extends Controller
         if (!isset($brand)) { return Response::json('invalid brand specified', 422); }
         $operation = Operation::where('brand_id', $brand->id)->where('name', $request->input('name', 'credit_check'))->first();
         if (!isset($operation)) { return Response::json('invalid operation specified', 422); }
+        $queue_name = env('RABBITMQ_QUEUE', 'fuseplug');  
+        if (isset($operation->queue)) {
+            $queue_name = $operation->queue;
+        }
         $super_call_id = SuperCall::create($request->all(), $operation->id);
-        HttpGet::dispatch($super_call_id)->onQueue('fuseplug')->onConnection('rabbitmq');
+        HttpGet::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
         return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }
     public function getCall(Request $request, $call_id)
