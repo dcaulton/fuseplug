@@ -16,7 +16,7 @@ class OperationsSeeder extends Seeder
         $brand = DB::table('brands')->get()[0];
         DB::table('operations')->insert([
             'brand_id' => $brand->id,
-            'name' => 'credit_check',
+            'name' => 'credit_check_laravel',
             'queue' => 'fuseplug_laravel'
         ]);
         $operation = DB::table('operations')->get()[0];
@@ -49,6 +49,12 @@ class OperationsSeeder extends Seeder
         ]);
         $operation_action = DB::table('operation_actions')->get()[0];
 
+        DB::table('operations')->insert([
+            'brand_id' => $brand->id,
+            'name' => 'credit_check_python',
+            'queue' => 'fuseplug_python'
+        ]);
+        $operation = DB::table('operations')->get()[0];
 
 //print_r($brand);
 //print_r($operation);
