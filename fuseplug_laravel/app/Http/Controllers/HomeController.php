@@ -51,7 +51,7 @@ This is what good post datalooks like for http_get:
         if (isset($control_data['operation'])) {
             $operation_name = $control_data['operation'];
         } 
-        $operation = Operation::where('brand_id', $brand->id)
+        $operation = Operation::where('brand_id', $brand->id) 
             ->where('name', $operation_name)
             ->first();
         if (!isset($operation)) { return Response::json('invalid operation specified', 422); }

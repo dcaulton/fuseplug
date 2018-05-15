@@ -47,11 +47,7 @@ class SuperCall extends Model
     public function get_summary() {
         $return_data = Array();
         $this_as_json = json_decode($this);
-        $this_as_json->calls = Array();
         $calls = Call::where('super_call_id', $this->id)->orderBy('updated_at')->get();
-        foreach ($calls as $call) {
-            array_push($this_as_json, json_decode($call));
-        }
         array_push($return_data, $this_as_json);
         return $return_data;
     }
