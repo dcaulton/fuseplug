@@ -17,9 +17,9 @@ class CreateCallsTable extends Migration
             $table->increments('id');
             $table->integer('operation_action_id')->unsigned();
             $table->integer('super_call_id')->unsigned();
-            $table->integer('request_data')->unsigned();
-            $table->string('response_data');
-            $table->string('error_messages');
+            $table->string('request_data');
+            $table->string('response_data')->nullable();
+            $table->string('error_messages')->nullable();
             $table->string('status_code');
             $table->timestamps();
 

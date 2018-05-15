@@ -51,7 +51,7 @@ This is what good post datalooks like for http_get:
         if (isset($control_data['operation'])) {
             $operation_name = $control_data['operation'];
         } 
-        $operation = Operation::where('brand_id', $brand->id)
+        $operation = Operation::where('brand_id', $brand->id) 
             ->where('name', $operation_name)
             ->first();
         if (!isset($operation)) { return Response::json('invalid operation specified', 422); }
@@ -61,7 +61,11 @@ This is what good post datalooks like for http_get:
             $queue_name = $operation->queue;
         }
         $super_call_id = SuperCall::create($payload, $operation->id);
-        HttpGet::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
+        $super_call = SuperCall::find($super_call_id);
+        $call = $super_call->get_next_call();
+        if ($call) {
+            HttpGet::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
+        }
         return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }
     public function getCall(Request $request, $call_id)
