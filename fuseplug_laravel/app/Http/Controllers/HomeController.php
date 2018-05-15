@@ -22,17 +22,34 @@ class HomeController extends Controller
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     public function createCall(Request $request)
     {
+/*
+This is what good post datalooks like for http_get:
+[
+  {"payload": 
+    {
+     "from": "Your Mama"
+    }
+ },
+ {"control": 
+ 	{"brand": "test_brand",
+ 	 "operation": "credit_check_laravel"
+ 	}
+ 	
+ }
+]
+*/
         $payload = $request->all()[0]['payload'];
+        $control_data = $request->all()[1]['control'];
         $brand_name = 'test_brand';
-        if (isset($payload['brand'])) {
-            $brand_name = $payload['brand'];
+        if (isset($control_data['brand'])) {
+            $brand_name = $control_data['brand'];
         } 
         $brand = Brand::where('name', $brand_name)->first();
         if (!isset($brand)) { return Response::json('invalid brand specified', 422); }
 
         $operation_name = 'credit_check_laravel';
-        if (isset($payload['operation'])) {
-            $operation_name = $payload['operation'];
+        if (isset($control_data['operation'])) {
+            $operation_name = $control_data['operation'];
         } 
         $operation = Operation::where('brand_id', $brand->id)
             ->where('name', $operation_name)
@@ -43,7 +60,7 @@ class HomeController extends Controller
         if (isset($operation->queue)) {
             $queue_name = $operation->queue;
         }
-        $super_call_id = SuperCall::create($request->all(), $operation->id);
+        $super_call_id = SuperCall::create($payload, $operation->id);
         HttpGet::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
         return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }
