@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\Call;
+use App\Models\OperationRule;
+use App\Models\OperationAction;
 use Illuminate\Database\Eloquent\Model;
 use Uuid;
 
@@ -52,5 +54,36 @@ class SuperCall extends Model
         }
         array_push($return_data, $this_as_json);
         return $return_data;
+    }
+    public function get_next_call() {
+        $rules = OperationRule::where('operation_id', $this->operation_id)->orderBy('order')->get();
+        $calls = Call::where('super_call_id', $this->id)->orderBy('updated_at')->get();
+        $called_action_ids = [];
+        $last_response = $this->initial_payload;
+        foreach ($calls as $call) {
+            array_push($called_action_ids, $call->operation_action_id);
+            $last_response = $call->response_data;
+        }
+        foreach ($rules as $rule) {
+            if (!$rule->should_be_called($this, $calls)) {
+                continue;
+            }
+            $actions = OperationAction::where('operation_rule_id', $rule->id)->orderBy('order')->get();
+            foreach ($actions as $action) {
+                if (in_array($action->id, $called_action_ids)) {
+                    continue;
+                }
+                // else we have actions for this rule which haven't been performed yet, create a call for the first one!
+                $call_id = Call::create($this, $action, $last_response);
+                return $call_id;
+            }
+        }
+        // if no more calls, make this supercall complete, move the last calls payload to final_response
+        $this->final_response = $last_response;
+        $this->status = 'COMPLETE';
+        if (!$this->save()) {
+            throw new \Exception('error finalizing supercall');
+        }
+        return null;
     }
 }
