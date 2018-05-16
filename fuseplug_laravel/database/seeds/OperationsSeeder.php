@@ -34,7 +34,6 @@ class OperationsSeeder extends Seeder
         ]);
         $operation_rule = DB::table('operation_rules')->get()[0];
 
-
         DB::table('operation_actions')->insert([
             'operation_rule_id' => $operation_rule->id,
             'order' => 1,
@@ -54,8 +53,34 @@ class OperationsSeeder extends Seeder
             'name' => 'credit_check_python',
             'queue' => 'fuseplug_python'
         ]);
-        $operation = DB::table('operations')->get()[0];
+        $operation = DB::table('operations')->get()[1];
 
+        DB::table('operation_rules')->insert([
+            'operation_id' => $operation->id,
+            'brand_version' => 'v2',
+            'fuse_version' => '58',
+            'order' => 1,
+            'acting_on' => 'request',
+            'do_always' => false,
+            'input_selector' => 'def',
+            'operator' => '=',
+            'allowed_value' => 'spe'
+        ]);
+        $operation_rule = DB::table('operation_rules')->get()[1];
+
+        DB::table('operation_actions')->insert([
+            'operation_rule_id' => $operation_rule->id,
+            'order' => 1,
+            'name' => 'send_stuff_to_whatever_python',
+            'input' => 'anakin',
+            'operation_type' => 'http',
+            'operation_source' => 'fuse',
+            'source_data' => '',
+            'brand_url' => 'http://idontcare.com/see/if/i/care',
+            'fuse_url' => 'http://whateveryousay.com/zero/worries',
+            'http_verb' => 'GET'
+        ]);
+        $operation_action = DB::table('operation_actions')->get()[0];
 //print_r($brand);
 //print_r($operation);
 //print_r($operation_rule);

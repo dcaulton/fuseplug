@@ -20,3 +20,6 @@ Homestead.json
 .rocketeer/
 
 .DS_Store
+
+*.pyc
+fuseplug_django/__pycache__/
