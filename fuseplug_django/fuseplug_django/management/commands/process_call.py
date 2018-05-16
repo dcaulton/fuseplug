@@ -1,4 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
+
+import pika
 #from polls.models import Question as Poll
 
 class Command(BaseCommand):
@@ -9,14 +11,11 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        print('you talkin to me?')
-#        for poll_id in options['poll_id']:
-#            try:
-#                poll = Poll.objects.get(pk=poll_id)
-#            except Poll.DoesNotExist:
-#                raise CommandError('Poll "%s" does not exist' % poll_id)
-#
-#            poll.opened = False
-#            poll.save()
-#
-#            self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))
+        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        channel = connection.channel()
+        channel.queue_declare(queue='fuseplug_python', durable=True)
+        def callback(ch, method, properties, body):
+            """docstring for callback"""
+            print("[x] Received: %r" % (body,))
+        channel.basic_consume(callback, queue='fuseplug_python', no_ack=True)
+        channel.start_consuming()
