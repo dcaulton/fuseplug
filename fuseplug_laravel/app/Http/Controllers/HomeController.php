@@ -12,7 +12,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-use App\Jobs\HttpGet;
+use App\Jobs\HttpJob;
 
 use Illuminate\Http\Request;
 use Response;
@@ -64,7 +64,7 @@ This is what good post datalooks like for http_get:
         $super_call = SuperCall::find($super_call_id);
         $call = $super_call->get_next_call();
         if ($call) {
-            HttpGet::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
+            HttpJob::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
         }
         return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }

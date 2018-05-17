@@ -2,14 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Services\HttpGetService;
+use App\Services\HttpService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class HttpGet implements ShouldQueue
+class HttpJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -32,6 +32,6 @@ class HttpGet implements ShouldQueue
      */
     public function handle()
     {
-        HttpGetService::processRequest($this->super_call_id);
+        HttpService::processRequest($this->super_call_id);
     }
 }

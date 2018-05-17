@@ -16,9 +16,9 @@ class CreateDataMappingsTable extends Migration
         Schema::create('data_mappings', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('operation_action_id')->unsigned();
-            $table->string('brand_versions');
-            $table->string('fuse_versions');
-            $table->string('template');
+            $table->string('brand_versions')->nullable();
+            $table->string('fuse_versions')->nullable;
+            $table->string('template')->nullable();
 
             $table->foreign('operation_action_id')->references('id')->on('operation_actions');
         });
