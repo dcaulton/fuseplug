@@ -6,6 +6,7 @@ use App\Jobs\Http;
 use App\Models\SuperCall;
 use App\Models\Call;
 use App\Models\Brand;
+use App\Models\DataMapping;
 use App\Models\Operation;
 use App\Models\OperationAction;
 use App\Models\OperationRule;
@@ -14,12 +15,11 @@ class HttpService
 {
     public static function doGetRequest($action, $call) {
         $target_url = $action->brand_url;
-        $from = 'Dave';
-        $initial_payload_array = json_decode($call->request_data, true);
-        if (array_key_exists('from', $initial_payload_array)) {
-            $from = rawurlencode($initial_payload_array['from']);
-        }
-        $target_url .= $from;
+        $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
+        if ($data_mapping) {
+            $target_url = $data_mapping->transform($call, $action);
+        } 
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $target_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

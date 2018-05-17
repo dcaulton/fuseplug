@@ -58,7 +58,8 @@ class OperationsSeeder extends Seeder
             'order' => 1,
             'source_field' => 'from',
             'target_field' => 'from',
-            'target_data_type' => 'url'
+            'target_data_type' => 'url',
+            'default_value' => 'somebody important'
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->get()[0];
 
@@ -93,6 +94,24 @@ class OperationsSeeder extends Seeder
             'http_verb' => 'GET'
         ]);
         $operation_action = DB::table('operation_actions')->get()[0];
+
+        DB::table('data_mappings')->insert([
+            'operation_action_id' => $operation_action->id,
+            'brand_versions' => 'v1,v2',
+            'fuse_versions' => '57-59'
+        ]);
+        $data_mapping = DB::table('data_mappings')->get()[1];
+
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 1,
+            'source_field' => 'from',
+            'target_field' => 'from',
+            'target_data_type' => 'url',
+            'default_value' => 'somebody important'
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->get()[1];
+
 //print_r($brand);
 //print_r($operation);
 //print_r($operation_rule);

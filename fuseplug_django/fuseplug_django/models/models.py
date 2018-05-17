@@ -59,6 +59,7 @@ class DataMappingDetail(models.Model):
     target_data_type = models.CharField(max_length=255)
     target_format_string = models.CharField(max_length=255)
     transform = models.CharField(max_length=255)
+    default_value = models.CharField(max_length=255)
 
     class Meta:
         managed = False

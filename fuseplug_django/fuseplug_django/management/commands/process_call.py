@@ -61,25 +61,22 @@ class Command(BaseCommand):
             call.status_code='ERROR'
             call.save()
 
-    def enqueue_next_call_or_close_out_supercall(self, super_call):
-        call = super_call.get_next_call()
-        if call:
-            print('get the queue info and dispatch the next call')
-########### here's a thought: if we keep the thing we dequeued, we can just enqueue that again, then even laravel could service it if we want.  Actually, that should work for celery too.  We might need to hack date fields and sequence numbers or something
-
     def handle(self, *args, **options):
         connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
         channel = connection.channel()
         channel.queue_declare(queue='fuseplug_python', durable=True)
         def callback(ch, method, properties, body):
-            """docstring for callback"""
-            self.print_body(body)
+#            self.print_body(body)
+            message_body = body
             super_call_id = self.get_super_call_id(body)
             call = self.get_latest_call(super_call_id)
             self.do_the_call(call)
             if call.status_code == 'COMPLETE':
                 super_call = SuperCall.objects.get(pk=super_call_id)
-                self.enqueue_next_call_or_close_out_supercall(super_call)
+                call = super_call.get_next_call()
+                if call:
+                    print('get the queue info and dispatch the next call')
+########### here's a thought: if we keep the thing we dequeued, we can just enqueue that again, then even laravel could service it if we want.  Actually, that should work for celery too.  We might need to hack date fields and sequence numbers or something
             if options['run_once'] == 'true':
                 exit()
         channel.basic_consume(callback, queue='fuseplug_python', no_ack=True)
