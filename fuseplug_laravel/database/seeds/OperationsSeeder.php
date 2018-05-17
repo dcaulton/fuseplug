@@ -38,11 +38,9 @@ class OperationsSeeder extends Seeder
             'operation_rule_id' => $operation_rule->id,
             'order' => 1,
             'name' => 'send_stuff_to_whatever',
-            'input' => 'jarjar',
             'operation_type' => 'http',
             'operation_source' => 'fuse',
-            'source_data' => '',
-            'brand_url' => 'http://dontcare.com/see/if/i/care',
+            'brand_url' => 'http://foaas.com/cool/{from}',
             'fuse_url' => 'http://whatever.com/zero/worries',
             'http_verb' => 'GET'
         ]);
@@ -72,10 +70,8 @@ class OperationsSeeder extends Seeder
             'operation_rule_id' => $operation_rule->id,
             'order' => 1,
             'name' => 'send_stuff_to_whatever_python',
-            'input' => 'anakin',
             'operation_type' => 'http',
             'operation_source' => 'fuse',
-            'source_data' => '',
             'brand_url' => 'http://idontcare.com/see/if/i/care',
             'fuse_url' => 'http://whateveryousay.com/zero/worries',
             'http_verb' => 'GET'

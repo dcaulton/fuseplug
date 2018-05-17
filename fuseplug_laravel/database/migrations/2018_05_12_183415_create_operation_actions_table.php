@@ -19,12 +19,10 @@ class CreateOperationActionsTable extends Migration
             $table->integer('order');
             $table->string('name')->unique();
             $table->string('queue')->nullable();
-            $table->string('input');
             $table->string('operation_type');
             $table->string('operation_source');
-            $table->string('source_data');
-            $table->string('brand_url');
-            $table->string('fuse_url');
+            $table->string('brand_url')->nullable();
+            $table->string('fuse_url')->nullable();
             $table->string('http_verb');
 
             $table->foreign('operation_rule_id')->references('id')->on('operation_rules');

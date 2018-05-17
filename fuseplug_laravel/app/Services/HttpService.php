@@ -13,7 +13,7 @@ use App\Models\OperationRule;
 class HttpService
 {
     public static function doGetRequest($action, $call) {
-        $target_url = 'http://foaas.com/cool/';
+        $target_url = $action->brand_url;
         $from = 'Dave';
         $initial_payload_array = json_decode($call->request_data, true);
         if (array_key_exists('from', $initial_payload_array)) {
