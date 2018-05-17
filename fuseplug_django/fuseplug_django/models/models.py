@@ -54,12 +54,11 @@ class Cronjob(models.Model):
 class DataMappingDetail(models.Model):
     data_mapping = models.ForeignKey('DataMapping', models.DO_NOTHING)
     order = models.IntegerField()
-    function_name = models.IntegerField()
-    source_field = models.IntegerField()
-    target_field = models.IntegerField()
-    target_data_type = models.IntegerField()
-    target_format_string = models.IntegerField()
-    transform = models.IntegerField()
+    source_field = models.CharField(max_length=255)
+    target_field = models.CharField(max_length=255)
+    target_data_type = models.CharField(max_length=255)
+    target_format_string = models.CharField(max_length=255)
+    transform = models.CharField(max_length=255)
 
     class Meta:
         managed = False

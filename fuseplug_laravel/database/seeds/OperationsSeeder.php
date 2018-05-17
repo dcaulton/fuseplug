@@ -46,6 +46,22 @@ class OperationsSeeder extends Seeder
         ]);
         $operation_action = DB::table('operation_actions')->get()[0];
 
+        DB::table('data_mappings')->insert([
+            'operation_action_id' => $operation_action->id,
+            'brand_versions' => 'v1,v2',
+            'fuse_versions' => '57-59'
+        ]);
+        $data_mapping = DB::table('data_mappings')->get()[0];
+
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 1,
+            'source_field' => 'from',
+            'target_field' => 'from',
+            'target_data_type' => 'url'
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->get()[0];
+
         DB::table('operations')->insert([
             'brand_id' => $brand->id,
             'name' => 'credit_check_python',
