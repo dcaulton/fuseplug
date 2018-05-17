@@ -30,6 +30,15 @@ class Call(models.Model):
         managed = False
         db_table = 'calls'
 
+    @classmethod
+    def create(cls, super_call, operation_action, input_data):
+        call = cls(operation_action_id=operation_action.id,
+            super_call_id=super_call.id,
+            request_data=input_data,
+            status_code='CREATED')
+        call.save()
+        return call
+        
 
 class Cronjob(models.Model):
     operation = models.ForeignKey('Operation', models.DO_NOTHING)
@@ -109,6 +118,12 @@ class OperationRule(models.Model):
         managed = False
         db_table = 'operation_rules'
 
+    def should_be_called(self, super_call, calls):
+        if self.do_always:
+            return True
+        # TODO: remove this hack soon
+        return True
+
 
 class Operation(models.Model):
     brand = models.ForeignKey(Brand, models.DO_NOTHING)
@@ -165,6 +180,24 @@ class SuperCall(models.Model):
     class Meta:
         managed = False
         db_table = 'super_calls'
+
+    def get_next_call(self):
+        calls = Call.objects.filter(super_call_id=self.id).order_by('-updated_at')
+        if calls:
+            last_response = calls[0].response_data
+            called_action_ids = [x.operation_action_id for x in calls]
+        rules = OperationRule.objects.filter(operation_id=self.operation_id).order_by('order')
+        for rule in rules:
+            if rule.should_be_called(self, calls):
+                actions = OperationAction.objects.filter(operation_rule_id=rule.id).order_by('order')
+                for action in actions:
+                    if action.id in called_action_ids:
+                        continue
+                    call = Call.create(self, action, last_response)
+                    return call.id
+        self.final_response = last_response
+        self.status = 'COMPLETE'
+        self.save()
 
 
 class User(models.Model):

@@ -6,7 +6,7 @@ import requests
 from django.core.management.base import BaseCommand, CommandError
 import pika
 
-from fuseplug_django.models.models import Call
+from fuseplug_django.models.models import Call, SuperCall
 
 class Command(BaseCommand):
     help = 'processes a fuseplug call'
@@ -61,8 +61,11 @@ class Command(BaseCommand):
             call.status_code='ERROR'
             call.save()
 
-    def enqueue_next_call_or_close_out_supercall(self, call):
-        print('building the next call or closing out the supercall')
+    def enqueue_next_call_or_close_out_supercall(self, super_call):
+        call = super_call.get_next_call()
+        if call:
+            print('get the queue info and dispatch the next call')
+########### here's a thought: if we keep the thing we dequeued, we can just enqueue that again, then even laravel could service it if we want.  Actually, that should work for celery too.  We might need to hack date fields and sequence numbers or something
 
     def handle(self, *args, **options):
         connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
@@ -75,7 +78,8 @@ class Command(BaseCommand):
             call = self.get_latest_call(super_call_id)
             self.do_the_call(call)
             if call.status_code == 'COMPLETE':
-                self.enqueue_next_call_or_close_out_supercall(call)
+                super_call = SuperCall.objects.get(pk=super_call_id)
+                self.enqueue_next_call_or_close_out_supercall(super_call)
             if options['run_once'] == 'true':
                 exit()
         channel.basic_consume(callback, queue='fuseplug_python', no_ack=True)
