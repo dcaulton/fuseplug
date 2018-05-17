@@ -17,7 +17,7 @@ class CreateOperationsTable extends Migration
             $table->increments('id');
             $table->integer('brand_id')->unsigned();
             $table->string('name')->unique();
-            $table->string('queue')->unique();
+            $table->string('queue');
 
             $table->foreign('brand_id')->references('id')->on('brands');
         });

@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Jobs\HttpGet;
+use App\Jobs\Http;
 use App\Models\SuperCall;
 use App\Models\Call;
 use App\Models\Brand;
 use App\Models\Operation;
 
-class HttpGetService
+class HttpService
 {
     public static function processRequest($super_call_id) {
         $target_url = 'http://foaas.com/cool/';
@@ -48,7 +48,7 @@ class HttpGetService
 			}
 
         } catch (\Exception $e) {
-            echo "caught exception in HttpGet: " . $e->getMessage() . "\n";
+            echo "caught exception in Http Service: " . $e->getMessage() . "\n";
             $super_call->status = 'FAILED';
             $super_call->save();
         }

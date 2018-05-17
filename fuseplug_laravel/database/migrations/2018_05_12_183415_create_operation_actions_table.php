@@ -18,6 +18,7 @@ class CreateOperationActionsTable extends Migration
             $table->integer('operation_rule_id')->unsigned();
             $table->integer('order');
             $table->string('name')->unique();
+            $table->string('queue')->nullable();
             $table->string('input');
             $table->string('operation_type');
             $table->string('operation_source');
