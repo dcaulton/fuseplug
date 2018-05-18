@@ -20,9 +20,9 @@ use Response;
 class HomeController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    public function createCall(Request $request)
-    {
-/*
+
+    public function createCall(Request $request) {
+/* 
 This is what good post datalooks like for http_get:
 [
   {"payload": 
@@ -37,7 +37,7 @@ This is what good post datalooks like for http_get:
  	
  }
 ]
-*/
+*/  
         $payload = $request->all()[0]['payload'];
         $control_data = $request->all()[1]['control'];
         $brand_name = 'test_brand';
@@ -99,6 +99,7 @@ This is what good post datalooks like for http_get:
             "software_commit_hash"=> "a9604030d2cfbf792dbd078b71d3979eec737b1c",
             "overall_status" => "great",
             "cronjobs" => "22",
+            "mocks" => "12",
             "operations" => 35];
         $status_obj['brands'] = [];
         $brands = Brand::all();
@@ -126,6 +127,13 @@ This is what good post datalooks like for http_get:
             '/brand-interfaces-doc'=> [
                 'GET' => "gets detailed information on the brands and services available to you"
             ],
+            '/mock/{mock id}'=> [
+                'GET' => "Do a mock GET request",
+                'POST' => "Do a mock POST request"
+            ],
+            '/mock'=> [
+                'GET' => "list all mock endpoints",
+            ],
         ];
         return Response::json($endpoints, 200);
     }
@@ -152,5 +160,29 @@ This is what good post datalooks like for http_get:
             }
         }
         return Response::json($brands, 200);
+    }
+
+    public function mockPost(Request $request, $call_id) {
+        $payload = $request->all();
+        $get_parameters = $request->query();
+        $response_data = ['dog'=>'food',
+            'call_time'=> date('M d, Y D H:m:s')];
+        return Response::json($response_data, 200);
+    }
+
+    public function mockGet(Request $request, $call_id) {
+        $payload = $request->all();
+        $get_parameters = $request->query();
+        $response_data = ['cat'=>'food',
+            'call_time'=> date('M d, Y D H:m:s')];
+        return Response::json($response_data, 200);
+    }
+
+    public function mockList(Request $request) {
+        $payload = $request->all();
+        $get_parameters = $request->query();
+        $response_data = ['all'=>'the mocks',
+            'call_time'=> date('M d, Y D H:m:s')];
+        return Response::json($response_data, 200);
     }
 }
