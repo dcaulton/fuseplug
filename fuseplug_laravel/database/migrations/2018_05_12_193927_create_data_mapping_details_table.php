@@ -22,6 +22,7 @@ class CreateDataMappingDetailsTable extends Migration
             $table->string('target_data_type')->nullable();
             $table->string('target_format_string')->nullable();
             $table->string('transform')->nullable();
+            $table->boolean('skip_if_empty')->default(false);
             $table->string('default_value')->nullable();
 
             $table->foreign('data_mapping_id')->references('id')->on('data_mappings');

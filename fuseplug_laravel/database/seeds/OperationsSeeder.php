@@ -19,7 +19,7 @@ class OperationsSeeder extends Seeder
             'name' => 'credit_check_laravel',
             'queue' => 'fuseplug_laravel'
         ]);
-        $operation = DB::table('operations')->get()[0];
+        $operation = DB::table('operations')->orderBy('id', 'desc')->first();
 
         DB::table('operation_rules')->insert([
             'operation_id' => $operation->id,
@@ -32,7 +32,7 @@ class OperationsSeeder extends Seeder
             'operator' => '=',
             'allowed_value' => 'special'
         ]);
-        $operation_rule = DB::table('operation_rules')->get()[0];
+        $operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
 
         DB::table('operation_actions')->insert([
             'operation_rule_id' => $operation_rule->id,
@@ -44,14 +44,14 @@ class OperationsSeeder extends Seeder
             'fuse_url' => 'http://whatever.com/zero/worries',
             'http_verb' => 'GET'
         ]);
-        $operation_action = DB::table('operation_actions')->get()[0];
+        $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
 
         DB::table('data_mappings')->insert([
             'operation_action_id' => $operation_action->id,
             'brand_versions' => 'v1,v2',
             'fuse_versions' => '57-59'
         ]);
-        $data_mapping = DB::table('data_mappings')->get()[0];
+        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
 
         DB::table('data_mapping_details')->insert([
             'data_mapping_id' => $data_mapping->id,
@@ -61,14 +61,24 @@ class OperationsSeeder extends Seeder
             'target_data_type' => 'url',
             'default_value' => 'somebody important'
         ]);
-        $data_mapping_detail = DB::table('data_mapping_details')->get()[0];
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 2,
+            'source_field' => 'get_param_one',
+            'target_field' => 'get_param_one',
+            'target_data_type' => 'url',
+            'skip_if_empty' => true,
+            'default_value' => ''
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
 
         DB::table('operations')->insert([
             'brand_id' => $brand->id,
             'name' => 'credit_check_python',
             'queue' => 'fuseplug_python'
         ]);
-        $operation = DB::table('operations')->get()[1];
+        $operation = DB::table('operations')->orderBy('id', 'desc')->first();
 
         DB::table('operation_rules')->insert([
             'operation_id' => $operation->id,
@@ -81,7 +91,7 @@ class OperationsSeeder extends Seeder
             'operator' => '=',
             'allowed_value' => 'spe'
         ]);
-        $operation_rule = DB::table('operation_rules')->get()[1];
+        $operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
 
         DB::table('operation_actions')->insert([
             'operation_rule_id' => $operation_rule->id,
@@ -93,14 +103,14 @@ class OperationsSeeder extends Seeder
             'fuse_url' => 'http://whateveryousay.com/zero/worries',
             'http_verb' => 'GET'
         ]);
-        $operation_action = DB::table('operation_actions')->get()[0];
+        $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
 
         DB::table('data_mappings')->insert([
             'operation_action_id' => $operation_action->id,
             'brand_versions' => 'v1,v2',
             'fuse_versions' => '57-59'
         ]);
-        $data_mapping = DB::table('data_mappings')->get()[1];
+        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
 
         DB::table('data_mapping_details')->insert([
             'data_mapping_id' => $data_mapping->id,
@@ -110,7 +120,7 @@ class OperationsSeeder extends Seeder
             'target_data_type' => 'url',
             'default_value' => 'somebody important'
         ]);
-        $data_mapping_detail = DB::table('data_mapping_details')->get()[1];
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
 
 //print_r($brand);
 //print_r($operation);
