@@ -18,6 +18,7 @@ class CreateDataMappingDetailsTable extends Migration
             $table->integer('data_mapping_id')->unsigned();
             $table->integer('order');
             $table->string('source_field');
+            $table->string('source_field_type')->default('payload');
             $table->string('target_field');
             $table->string('target_data_type')->nullable();
             $table->string('target_format_string')->nullable();

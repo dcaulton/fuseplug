@@ -33,10 +33,19 @@ function gen_uuid() {
 
 class SuperCall extends Model
 {
-    public static function create($data, $operation_id) {
+    public static function create($payload, $get_parameters, $operation_id) {
         $super_call = new SuperCall;
         $super_call->operation_id = $operation_id;
-        $super_call->initial_payload = json_encode($data);
+
+        $payload_obj = [];
+        $payload_obj['get_parameters'] = $get_parameters;
+        foreach (array_keys($payload_obj['get_parameters']) as $get_parm_key) {
+            $payload_obj['get_parameters'][$get_parm_key] = 
+                rawurldecode($payload_obj['get_parameters'][$get_parm_key]);
+        }
+        $payload_obj['payload'] = $payload;
+        $super_call->initial_payload = json_encode($payload_obj);
+
         $super_call->status = 'ACTIVE';
         if (!$super_call->save()) {
             throw new \Exception('error creating supercall');

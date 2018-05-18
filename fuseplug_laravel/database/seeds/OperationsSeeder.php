@@ -37,11 +37,11 @@ class OperationsSeeder extends Seeder
         DB::table('operation_actions')->insert([
             'operation_rule_id' => $operation_rule->id,
             'order' => 1,
-            'name' => 'send_stuff_to_whatever',
+            'name' => 'hit foaas company endpoint',
             'operation_type' => 'http',
             'operation_source' => 'fuse',
-            'brand_url' => 'http://foaas.com/cool/{from}',
-            'fuse_url' => 'http://whatever.com/zero/worries',
+            'brand_url' => 'http://foaas.com/anyway/{company}/{from}',
+            'fuse_url' => '',
             'http_verb' => 'GET'
         ]);
         $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
@@ -57,6 +57,7 @@ class OperationsSeeder extends Seeder
             'data_mapping_id' => $data_mapping->id,
             'order' => 1,
             'source_field' => 'from',
+            'source_field_type' => 'payload',
             'target_field' => 'from',
             'target_data_type' => 'url',
             'default_value' => 'somebody important'
@@ -65,11 +66,12 @@ class OperationsSeeder extends Seeder
         DB::table('data_mapping_details')->insert([
             'data_mapping_id' => $data_mapping->id,
             'order' => 2,
-            'source_field' => 'get_param_one',
-            'target_field' => 'get_param_one',
+            'source_field' => 'company',
+            'source_field_type' => 'get_parameter',
+            'target_field' => 'company',
             'target_data_type' => 'url',
             'skip_if_empty' => true,
-            'default_value' => ''
+            'default_value' => 'Honda of America'
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
 
