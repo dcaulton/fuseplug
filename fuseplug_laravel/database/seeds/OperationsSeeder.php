@@ -13,9 +13,10 @@ class OperationsSeeder extends Seeder
     public function run()
     {
         //
-        $brand = DB::table('brands')->get()[0];
+        $test_brand = DB::table('brands')->orderBy('id', 'asc')->first();
+        $mock_brand = DB::table('brands')->orderBy('id', 'desc')->first();
         DB::table('operations')->insert([
-            'brand_id' => $brand->id,
+            'brand_id' => $test_brand->id,
             'name' => 'credit_check_laravel',
             'queue' => 'fuseplug_laravel'
         ]);
@@ -63,6 +64,11 @@ class OperationsSeeder extends Seeder
             'default_value' => 'somebody important'
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+
+
+
+
+
         DB::table('data_mapping_details')->insert([
             'data_mapping_id' => $data_mapping->id,
             'order' => 2,
@@ -76,7 +82,7 @@ class OperationsSeeder extends Seeder
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
 
         DB::table('operations')->insert([
-            'brand_id' => $brand->id,
+            'brand_id' => $test_brand->id,
             'name' => 'credit_check_python',
             'queue' => 'fuseplug_python'
         ]);
@@ -124,11 +130,56 @@ class OperationsSeeder extends Seeder
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
 
-//print_r($brand);
-//print_r($operation);
-//print_r($operation_rule);
-//print_r($operation_action);
+        // make mock endpoint for post
+        DB::table('operations')->insert([
+            'brand_id' => $mock_brand->id,
+            'name' => 'mock_post_endpoint'
+        ]);
+        $operation = DB::table('operations')->orderBy('id', 'desc')->first();
 
-        
+        DB::table('operation_rules')->insert([
+            'operation_id' => $operation->id,
+            'brand_version' => 'dontcare',
+            'fuse_version' => 'dontcare',
+            'order' => 1,
+            'acting_on' => 'dontcare',
+            'do_always' => true,
+            'input_selector' => 'dontcare',
+            'operator' => '=',
+            'allowed_value' => 'dontcare'
+        ]);
+        $operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
+
+        DB::table('operation_actions')->insert([
+            'operation_rule_id' => $operation_rule->id,
+            'order' => 1,
+            'name' => 'dontcare',
+            'operation_type' => 'mock',
+            'operation_source' => 'dontcare',
+            'brand_url' => 'dontcare',
+            'fuse_url' => 'dontcare',
+            'extra_parameters' => '{"sleep_time_milliseconds": "2000"}',
+            'http_verb' => 'POST'
+        ]);
+        $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mappings')->insert([
+            'operation_action_id' => $operation_action->id,
+            'brand_versions' => 'dontcare',
+            'fuse_versions' => 'dontcare',
+            'template' => '{"this_is_from": "{from}"}'
+        ]);
+        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 1,
+            'source_field' => 'from',
+            'source_field_type' => 'payload',
+            'target_field' => 'from',
+            'target_data_type' => 'payload',
+            'default_value' => 'some guy'
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
     }
 }

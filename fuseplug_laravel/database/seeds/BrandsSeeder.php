@@ -15,5 +15,8 @@ class BrandsSeeder extends Seeder
         DB::table('brands')->insert([
             'name' => 'test_brand'
         ]);
+        DB::table('brands')->insert([
+            'name' => 'mock_brand'
+        ]);
     }
 }

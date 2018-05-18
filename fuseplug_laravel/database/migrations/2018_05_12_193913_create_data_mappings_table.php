@@ -18,7 +18,7 @@ class CreateDataMappingsTable extends Migration
             $table->integer('operation_action_id')->unsigned();
             $table->string('brand_versions')->nullable();
             $table->string('fuse_versions')->nullable;
-            $table->string('template')->nullable();
+            $table->string('template', 4096)->nullable();
 
             $table->foreign('operation_action_id')->references('id')->on('operation_actions');
         });

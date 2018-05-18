@@ -72,7 +72,7 @@ class DataMapping(models.Model):
     operation_action = models.ForeignKey('OperationAction', models.DO_NOTHING)
     brand_versions = models.CharField(max_length=255)
     fuse_versions = models.CharField(max_length=255)
-    template = models.CharField(max_length=255)
+    template = models.CharField(max_length=4096)
 
     class Meta:
         managed = False
@@ -96,6 +96,7 @@ class OperationAction(models.Model):
     operation_source = models.CharField(max_length=255)
     brand_url = models.CharField(max_length=255)
     fuse_url = models.CharField(max_length=255)
+    extra_parameters = models.CharField(max_length=1024)
     http_verb = models.CharField(max_length=255)
 
     class Meta:

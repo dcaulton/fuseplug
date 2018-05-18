@@ -17,7 +17,7 @@ class HttpService
         $target_url = $action->brand_url;
         $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
         if ($data_mapping) {
-            $target_url = $data_mapping->transform($call, $action);
+            $target_url = $data_mapping->transform($call->request_data, $action);
         } 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $target_url);

@@ -23,6 +23,7 @@ class CreateOperationActionsTable extends Migration
             $table->string('operation_source');
             $table->string('brand_url')->nullable();
             $table->string('fuse_url')->nullable();
+            $table->string('extra_parameters', 1024)->nullable();
             $table->string('http_verb');
 
             $table->foreign('operation_rule_id')->references('id')->on('operation_rules');

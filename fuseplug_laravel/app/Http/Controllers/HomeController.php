@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\DataMapping;
+use App\Models\DataMappingDetail;
 use App\Models\Operation;
 use App\Models\OperationRule;
 use App\Models\OperationAction;
@@ -20,9 +22,9 @@ use Response;
 class HomeController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    public function createCall(Request $request)
-    {
-/*
+
+    public function createCall(Request $request) {
+/* 
 This is what good post datalooks like for http_get:
 [
   {"payload": 
@@ -37,7 +39,7 @@ This is what good post datalooks like for http_get:
  	
  }
 ]
-*/
+*/  
         $payload = $request->all()[0]['payload'];
         $control_data = $request->all()[1]['control'];
         $brand_name = 'test_brand';
@@ -99,6 +101,7 @@ This is what good post datalooks like for http_get:
             "software_commit_hash"=> "a9604030d2cfbf792dbd078b71d3979eec737b1c",
             "overall_status" => "great",
             "cronjobs" => "22",
+            "mocks" => "12",
             "operations" => 35];
         $status_obj['brands'] = [];
         $brands = Brand::all();
@@ -126,6 +129,10 @@ This is what good post datalooks like for http_get:
             '/brand-interfaces-doc'=> [
                 'GET' => "gets detailed information on the brands and services available to you"
             ],
+            '/mock/{mock id}'=> [
+                'GET' => "Do a mock GET request",
+                'POST' => "Do a mock POST request"
+            ],
         ];
         return Response::json($endpoints, 200);
     }
@@ -140,10 +147,19 @@ This is what good post datalooks like for http_get:
                 $operation_rules = json_decode(OperationRule::where('operation_id', $operation->id)->get());
                 $operation->operation_rules = Array();
                 foreach ($operation_rules as $operation_rule) {
-   
                     $operation_actions = json_decode(OperationAction::where('operation_rule_id', $operation_rule->id)->get());
                     $operation_rule->operation_actions = Array();
                     foreach ($operation_actions as $operation_action) {
+                        $data_mappings = json_decode(DataMapping::where('operation_action_id', $operation_action->id)->get());
+                        $operation_action->data_mappings = Array();
+                        foreach ($data_mappings as $data_mapping) {
+                            $data_mapping_details = json_decode(DataMappingDetail::where('data_mapping_id', $data_mapping->id)->get());
+                            $data_mapping->data_mapping_details = Array();
+                            foreach ($data_mapping_details as $data_mapping_detail) {
+                                array_push($data_mapping->data_mapping_details, $data_mapping_detail);
+                            }
+                            array_push($operation_action->data_mappings, $data_mapping);
+                        }
                         array_push($operation_rule->operation_actions, $operation_action);
                     }
                     array_push($operation->operation_rules, $operation_rule);
@@ -152,5 +168,31 @@ This is what good post datalooks like for http_get:
             }
         }
         return Response::json($brands, 200);
+    }
+
+    public function mockPost(Request $request, $operation_id) {
+        $payload = $request->all();
+        $get_parameters = $request->query();
+        $request_obj = Array();
+        $request_obj['get_parameters'] = $get_parameters;
+        $request_obj['payload'] = $payload;
+        $request_obj = json_encode($request_obj);
+        $rule = OperationRule::where('operation_id', $operation_id)->first();
+        $action = OperationAction::where('operation_rule_id', $rule->id)->first();
+        $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
+        if ($data_mapping) {
+            $response_data = $data_mapping->transform($request_obj, $action);
+        }
+//        $response_data = ['dog'=>'food',
+//            'call_time'=> date('M d, Y D H:m:s')];
+        return Response::json($response_data, 200);
+    }
+
+    public function mockGet(Request $request, $operation_id) {
+        $payload = $request->all();
+        $get_parameters = $request->query();
+        $response_data = ['cat'=>'food',
+            'call_time'=> date('M d, Y D H:m:s')];
+        return Response::json($response_data, 200);
     }
 }
