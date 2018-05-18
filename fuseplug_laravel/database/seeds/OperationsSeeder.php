@@ -159,7 +159,7 @@ class OperationsSeeder extends Seeder
             'brand_url' => 'dontcare',
             'fuse_url' => 'dontcare',
             'extra_parameters' => '{"sleep_time_milliseconds": "2000"}',
-            'http_verb' => 'dontcare'
+            'http_verb' => 'POST'
         ]);
         $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
 
