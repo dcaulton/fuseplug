@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\DataMapping;
+use App\Models\DataMappingDetail;
 use App\Models\Operation;
 use App\Models\OperationRule;
 use App\Models\OperationAction;
@@ -131,9 +133,6 @@ This is what good post datalooks like for http_get:
                 'GET' => "Do a mock GET request",
                 'POST' => "Do a mock POST request"
             ],
-            '/mock'=> [
-                'GET' => "list all mock endpoints",
-            ],
         ];
         return Response::json($endpoints, 200);
     }
@@ -148,10 +147,19 @@ This is what good post datalooks like for http_get:
                 $operation_rules = json_decode(OperationRule::where('operation_id', $operation->id)->get());
                 $operation->operation_rules = Array();
                 foreach ($operation_rules as $operation_rule) {
-   
                     $operation_actions = json_decode(OperationAction::where('operation_rule_id', $operation_rule->id)->get());
                     $operation_rule->operation_actions = Array();
                     foreach ($operation_actions as $operation_action) {
+                        $data_mappings = json_decode(DataMapping::where('operation_action_id', $operation_action->id)->get());
+                        $operation_action->data_mappings = Array();
+                        foreach ($data_mappings as $data_mapping) {
+                            $data_mapping_details = json_decode(DataMappingDetail::where('data_mapping_id', $data_mapping->id)->get());
+                            $data_mapping->data_mapping_details = Array();
+                            foreach ($data_mapping_details as $data_mapping_detail) {
+                                array_push($data_mapping->data_mapping_details, $data_mapping_detail);
+                            }
+                            array_push($operation_action->data_mappings, $data_mapping);
+                        }
                         array_push($operation_rule->operation_actions, $operation_action);
                     }
                     array_push($operation->operation_rules, $operation_rule);
@@ -178,11 +186,4 @@ This is what good post datalooks like for http_get:
         return Response::json($response_data, 200);
     }
 
-    public function mockList(Request $request) {
-        $payload = $request->all();
-        $get_parameters = $request->query();
-        $response_data = ['all'=>'the mocks',
-            'call_time'=> date('M d, Y D H:m:s')];
-        return Response::json($response_data, 200);
-    }
 }

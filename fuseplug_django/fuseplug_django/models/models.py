@@ -72,7 +72,7 @@ class DataMapping(models.Model):
     operation_action = models.ForeignKey('OperationAction', models.DO_NOTHING)
     brand_versions = models.CharField(max_length=255)
     fuse_versions = models.CharField(max_length=255)
-    template = models.CharField(max_length=255)
+    template = models.CharField(max_length=4096)
 
     class Meta:
         managed = False

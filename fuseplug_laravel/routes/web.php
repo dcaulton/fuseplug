@@ -22,5 +22,4 @@ Route::get('app-status', 'HomeController@appStatus');
 Route::get('app-api-doc', 'HomeController@appApiDoc');
 Route::get('brand-interfaces-doc', 'HomeController@brandInterfaceDoc');
 Route::post('mock/{id}', 'HomeController@mockPost');
-Route::get('mock', 'HomeController@mockList');
 Route::get('mock/{id}', 'HomeController@mockGet');
