@@ -55,10 +55,12 @@ class DataMappingDetail(models.Model):
     data_mapping = models.ForeignKey('DataMapping', models.DO_NOTHING)
     order = models.IntegerField()
     source_field = models.CharField(max_length=255)
+    source_field_type = models.CharField(max_length=255)
     target_field = models.CharField(max_length=255)
     target_data_type = models.CharField(max_length=255)
     target_format_string = models.CharField(max_length=255)
     transform = models.CharField(max_length=255)
+    skip_if_empty = models.IntegerField()
     default_value = models.CharField(max_length=255)
 
     class Meta:

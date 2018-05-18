@@ -7,10 +7,11 @@ use App\Models\DataMappingDetail;
 
 class DataMapping extends Model
 {
-    //
     public function transform($call, $operation_action) {
         $data_mapping_details = DataMappingDetail::where('data_mapping_id', $this->id)->orderBy('order')->get();
         $source_data = json_decode($call->request_data, true);
+        $source_data_payload = $source_data['payload'];
+        $source_data_get_parameters = $source_data['get_parameters'];
         if ($operation_action->http_verb == 'GET') {
             // we're building a url
             if ($operation_action->operation_source =='fuse') {
@@ -26,9 +27,16 @@ class DataMapping extends Model
                         if (isset($data_mapping_detail->default_value)) {
                             $replace_with_value = $data_mapping_detail->default_value;
                         }
-                        if ((isset($data_mapping_detail->source_field)) && 
-                            (isset($source_data[$data_mapping_detail->source_field]))) {
-                            $replace_with_value = $source_data[$data_mapping_detail->source_field];
+                        if ($data_mapping_detail->source_field_type == 'payload') {
+                            if ((isset($data_mapping_detail->source_field)) && 
+                                (isset($source_data_payload[$data_mapping_detail->source_field]))) {
+                                $replace_with_value = $source_data_payload[$data_mapping_detail->source_field];
+                            }
+                        } else { // its a get parameter
+                            if ((isset($data_mapping_detail->source_field)) && 
+                                (isset($source_data_get_parameters[$data_mapping_detail->source_field]))) {
+                                $replace_with_value = $source_data_get_parameters[$data_mapping_detail->source_field];
+                            }
                         }
                         $replace_with_value = rawurlencode($replace_with_value);
                         if (isset($data_mapping_detail->target_field)) {

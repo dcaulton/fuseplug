@@ -19,7 +19,6 @@ class HttpService
         if ($data_mapping) {
             $target_url = $data_mapping->transform($call, $action);
         } 
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $target_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
