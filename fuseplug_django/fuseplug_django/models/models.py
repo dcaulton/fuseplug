@@ -94,8 +94,6 @@ class OperationAction(models.Model):
     name = models.CharField(unique=True, max_length=255)
     operation_type = models.CharField(max_length=255)
     operation_source = models.CharField(max_length=255)
-    brand_url = models.CharField(max_length=255)
-    fuse_url = models.CharField(max_length=255)
     extra_parameters = models.CharField(max_length=1024)
     http_verb = models.CharField(max_length=255)
 

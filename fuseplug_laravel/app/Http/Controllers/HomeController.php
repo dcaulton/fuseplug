@@ -171,28 +171,37 @@ This is what good post datalooks like for http_get:
     }
 
     public function mockPost(Request $request, $operation_id) {
+        $request_obj = $this->package_request_data($request);
+        $response_data = $this->map_mock_data($request_obj, $operation_id);
+sleep(3);
+        return Response::json($response_data, 200);
+    }
+
+    public function mockGet(Request $request, $operation_id) {
+        $request_obj = $this->package_request_data($request);
+        $response_data = $this->map_mock_data($request_obj, $operation_id);
+sleep(3);
+        return Response::json($response_data, 200);
+    }
+
+    private function map_mock_data($request_obj, $operation_id) {
+        $rule = OperationRule::where('operation_id', $operation_id)->first();
+        $action = OperationAction::where('operation_rule_id', $rule->id)->first();
+        $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
+        if ($data_mapping) {
+            $response_data = $data_mapping->transform($request_obj, $action);
+            $response_data = json_decode($response_data);
+        }
+        return $response_data;
+    }
+
+    private function package_request_data($request) {
         $payload = $request->all();
         $get_parameters = $request->query();
         $request_obj = Array();
         $request_obj['get_parameters'] = $get_parameters;
         $request_obj['payload'] = $payload;
         $request_obj = json_encode($request_obj);
-        $rule = OperationRule::where('operation_id', $operation_id)->first();
-        $action = OperationAction::where('operation_rule_id', $rule->id)->first();
-        $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
-        if ($data_mapping) {
-            $response_data = $data_mapping->transform($request_obj, $action);
-        }
-//        $response_data = ['dog'=>'food',
-//            'call_time'=> date('M d, Y D H:m:s')];
-        return Response::json($response_data, 200);
-    }
-
-    public function mockGet(Request $request, $operation_id) {
-        $payload = $request->all();
-        $get_parameters = $request->query();
-        $response_data = ['cat'=>'food',
-            'call_time'=> date('M d, Y D H:m:s')];
-        return Response::json($response_data, 200);
+        return $request_obj;
     }
 }

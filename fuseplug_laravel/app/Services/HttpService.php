@@ -14,7 +14,7 @@ use App\Models\OperationRule;
 class HttpService
 {
     public static function doGetRequest($action, $call) {
-        $target_url = $action->brand_url;
+        $target_url = $action->get_url();
         $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
         if ($data_mapping) {
             $target_url = $data_mapping->transform($call->request_data, $action);

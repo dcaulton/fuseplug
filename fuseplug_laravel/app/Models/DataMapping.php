@@ -38,11 +38,9 @@ class DataMapping extends Model
         $data_mapping_details = DataMappingDetail::where('data_mapping_id', $this->id)->orderBy('order')->get();
         $source_data = json_decode($request_data, true);
 
+        $return_data = $this->template;
+
         if ($operation_action->http_verb == 'GET') {
-            // we're building a url
-            if ($operation_action->operation_source =='fuse') {
-                $target_url = $operation_action->brand_url;
-            }
             if (($operation_action->operation_type == 'http') || 
                 ($operation_action->operation_type == 'format_data')) {
                 foreach ($data_mapping_details as $data_mapping_detail) {
@@ -51,20 +49,20 @@ class DataMapping extends Model
                         $replace_with_value = $this->get_replace_with_value($data_mapping_detail, $source_data);
                         $replace_with_value = rawurlencode($replace_with_value);
                         $replacement_selector = $this->build_target_selector($data_mapping_detail);
-                        $target_url = str_replace($replacement_selector, $replace_with_value, $target_url);
+                        $return_data = str_replace($replacement_selector, $replace_with_value, $return_data);
                     }
                 }
             }
-            return $target_url;
-        } 
-        if ($operation_action->http_verb == 'POST') {
+        } elseif ($operation_action->http_verb == 'POST') {
             $return_data = $this->template;
             foreach ($data_mapping_details as $data_mapping_detail) {
-                $replace_with_value = $this->get_replace_with_value($data_mapping_detail, $source_data);
-                $replacement_selector = $this->build_target_selector($data_mapping_detail);
-                $return_data = str_replace($replacement_selector, $replace_with_value, $return_data);
+                if ($data_mapping_detail->target_data_type == 'payload') {
+                    $replace_with_value = $this->get_replace_with_value($data_mapping_detail, $source_data);
+                    $replacement_selector = $this->build_target_selector($data_mapping_detail);
+                    $return_data = str_replace($replacement_selector, $replace_with_value, $return_data);
+                }
             }
-            return $return_data;
         }
+        return $return_data;
     }
 }
