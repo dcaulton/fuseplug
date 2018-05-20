@@ -161,7 +161,7 @@ class OperationsSeeder extends Seeder
             'name' => 'mock_post_operation',
             'operation_type' => 'mock',
             'operation_source' => 'dontcare',
-            'extra_parameters' => '{"sleep_time_milliseconds": "2000"}',
+            'extra_parameters' => '{"sleep_time_min_milliseconds": "500", "sleep_time_max_milliseconds": "2000"}',
             'http_verb' => 'POST'
         ]);
         $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();

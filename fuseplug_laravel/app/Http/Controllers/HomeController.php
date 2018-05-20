@@ -173,15 +173,31 @@ This is what good post datalooks like for http_get:
     public function mockPost(Request $request, $operation_id) {
         $request_obj = $this->package_request_data($request);
         $response_data = $this->map_mock_data($request_obj, $operation_id);
-sleep(3);
+        $this->sleep_if_needed($operation_id);
         return Response::json($response_data, 200);
     }
 
     public function mockGet(Request $request, $operation_id) {
         $request_obj = $this->package_request_data($request);
         $response_data = $this->map_mock_data($request_obj, $operation_id);
-sleep(3);
+        $this->sleep_if_needed($operation_id);
         return Response::json($response_data, 200);
+    }
+
+    private function sleep_if_needed($operation_id) {
+        $rule = OperationRule::where('operation_id', $operation_id)->first();
+        $action = OperationAction::where('operation_rule_id', $rule->id)->first();
+        if (isset($action->extra_parameters)) {
+            $extra_parms = json_decode($action->extra_parameters);
+            if (isset($extra_parms->sleep_time_fixed_milliseconds)) {
+                $sleep_time_micro = 1000 * $extra_parms->sleep_time_fixed_milliseconds;
+                usleep($sleep_time_micro);
+            } elseif (isset($extra_parms->sleep_time_min_milliseconds) &&
+                    isset($extra_parms->sleep_time_max_milliseconds)) {
+                $rand_micro = 1000 * rand($extra_parms->sleep_time_min_milliseconds, $extra_parms->sleep_time_max_milliseconds);
+                usleep($rand_micro);
+            }
+        }
     }
 
     private function map_mock_data($request_obj, $operation_id) {
