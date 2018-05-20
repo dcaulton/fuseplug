@@ -48,7 +48,7 @@ class OperationsSeeder extends Seeder
         DB::table('data_mappings')->insert([
             'operation_action_id' => $operation_action->id,
             'brand_versions' => 'v1,v2',
-            'template' => 'http://foaas.com/anyway/{company}/{from}',
+            'template' => '{brand_root_url}/anyway/{company}/{from}',
             'fuse_versions' => '57-59'
         ]);
         $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
@@ -68,11 +68,22 @@ class OperationsSeeder extends Seeder
             'data_mapping_id' => $data_mapping->id,
             'order' => 2,
             'source_field' => 'company',
-            'source_field_type' => 'get_parameter',
+            'source_field_type' => 'url',
             'target_field' => 'company',
             'target_data_type' => 'url',
             'skip_if_empty' => true,
             'default_value' => 'Honda of America'
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 3,
+            'source_field' => 'TEST_CLIENT_ROOT_URL',
+            'target_field' => 'brand_root_url',
+            'target_data_type' => 'url',
+            'transform' => 'env_variable',
+            'default_value' => 'http://it_didnt_get_set.com'
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
 
@@ -159,7 +170,7 @@ class OperationsSeeder extends Seeder
             'operation_action_id' => $operation_action->id,
             'brand_versions' => 'dontcare',
             'fuse_versions' => 'dontcare',
-            'template' => '{"this_is_from": "{from}", "processed_at": "{current_datetime}"}'
+            'template' => '{"this_is_from": "{from}", "processed_at": "{current_datetime}", "test_url": "{test_root_url}"}'
         ]);
         $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
 
@@ -183,6 +194,17 @@ class OperationsSeeder extends Seeder
             'target_format_string' => 'M d, Y D H:m:s',
             'transform' => 'php_format_date',
             'default_value' => ''
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 3,
+            'source_field' => 'TEST_CLIENT_ROOT_URL',
+            'source_field_type' => '',
+            'target_field' => 'test_root_url',
+            'target_data_type' => 'payload',
+            'transform' => 'env_variable',
+            'default_value' => 'http://im_a_luzer.com'
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
     }
