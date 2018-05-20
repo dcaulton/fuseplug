@@ -20,6 +20,7 @@ class CreateCallsTable extends Migration
             $table->string('request_data');
             $table->string('response_data')->nullable();
             $table->string('error_messages')->nullable();
+            $table->string('debug_info', 4096)->nullable();
             $table->string('status_code');
             $table->timestamps();
 

@@ -22,6 +22,7 @@ class Call(models.Model):
     request_data = models.CharField(max_length=255)
     response_data = models.CharField(max_length=255, blank=True, null=True)
     error_messages = models.CharField(max_length=255, blank=True, null=True)
+    debug_info = models.CharField(max_length=4096, blank=True, null=True)
     status_code = models.CharField(max_length=255)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
@@ -72,6 +73,7 @@ class DataMapping(models.Model):
     operation_action = models.ForeignKey('OperationAction', models.DO_NOTHING)
     brand_versions = models.CharField(max_length=255)
     fuse_versions = models.CharField(max_length=255)
+    object_type_being_created = models.CharField(max_length=255)
     template = models.CharField(max_length=4096)
 
     class Meta:

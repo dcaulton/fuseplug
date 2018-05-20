@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Jobs\Http;
+use App\Jobs\HttpJob;
 use App\Models\SuperCall;
 use App\Models\Call;
 use App\Models\Brand;
@@ -14,8 +14,9 @@ use App\Models\OperationRule;
 class HttpService
 {
     public static function doGetRequest($action, $call) {
-        $target_url = $action->get_url();
-        $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
+        $data_mapping = DataMapping::where('operation_action_id', $action->id)
+            ->where('object_type_being_created', 'url')
+            ->first();
         if ($data_mapping) {
             $target_url = $data_mapping->transform($call->request_data, $action);
         } 
@@ -27,13 +28,56 @@ class HttpService
             "Content-Type: application/json",
             "Accept: application/json"
         ));
+
+        $debug_data = Array();
+        $debug_data["called_url"] = $target_url;
+        $debug_data["payload_to_url"] = '';
+
         $data = curl_exec($ch);
+
+        $info = curl_getinfo($ch);
+        $debug_data["response_code"] = $info['http_code'];
+        $call->debug_info = json_encode($debug_data);
+
         curl_close($ch);
         return $data;
     }
 
     public static function doPostRequest($action, $call) {
-        return 'doPostRequest is not yet implemented';
+        $url_data_mapping = DataMapping::where('operation_action_id', $action->id)
+            ->where('object_type_being_created', 'url')
+            ->first();
+        if ($url_data_mapping) {
+            $target_url = $url_data_mapping->transform($call->request_data, $action);
+        } 
+        $payload_data_mapping = DataMapping::where('operation_action_id', $action->id)
+            ->where('object_type_being_created', 'payload')
+            ->first();
+        if ($payload_data_mapping) {
+            $payload = $payload_data_mapping->transform($call->request_data, $action);
+        } 
+        $payload=json_decode($payload);
+        $curl = curl_init($target_url);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($payload));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            "Content-Type: application/json",
+            "Accept: application/json"
+        ));
+
+        $debug_data = Array();
+        $debug_data["called_url"] = $target_url;
+        $debug_data["payload_to_url"] = $payload;
+
+        $response = curl_exec($curl);
+
+        $info = curl_getinfo($curl);
+        $debug_data["response_code"] = $info['http_code'];
+        $call->debug_info = json_encode($debug_data);
+
+        curl_close($curl);
+        return $response;
     }
 
     public static function getQueueName($operation, $action) {
@@ -58,7 +102,7 @@ class HttpService
             if ($action->http_verb == 'GET') {
                 $data = self::doGetRequest($action, $call);
             } else {
-                $data = self::doPostRequest();
+                $data = self::doPostRequest($action, $call);
             }
              
             $call->response_data = $data;
@@ -68,7 +112,7 @@ class HttpService
 			// determine the next call and schedule it
 			$call = $super_call->get_next_call();
 			if ($call) {
-				HttpGet::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
+				HttpJob::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
 			}
 
         } catch (\Exception $e) {

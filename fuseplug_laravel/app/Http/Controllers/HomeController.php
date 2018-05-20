@@ -203,7 +203,9 @@ This is what good post datalooks like for http_get:
     private function map_mock_data($request_obj, $operation_id) {
         $rule = OperationRule::where('operation_id', $operation_id)->first();
         $action = OperationAction::where('operation_rule_id', $rule->id)->first();
-        $data_mapping = DataMapping::where('operation_action_id', $action->id)->first();
+        $data_mapping = DataMapping::where('operation_action_id', $action->id)
+            ->where('object_type_being_created', 'payload')
+            ->first();
         if ($data_mapping) {
             $response_data = $data_mapping->transform($request_obj, $action);
             $response_data = json_decode($response_data);
