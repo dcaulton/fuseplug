@@ -53,12 +53,17 @@ class Command(BaseCommand):
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             }
+            debug_data = {'called_url': target_url, 'payload_to_url': ''}
             response = requests.get(target_url, headers=headers)
             call.response_data = response.json() 
+            debug_data['response_code'] = response.status_code
+            call.debug_info = json.dumps(debug_data)
             call.status_code='COMPLETE'
             call.save()
         except Exception as no_way:
-            call.status_code='ERROR'
+            error_data = {'message': str(no_way), 'error_class': no_way.__class__.__name__}
+            call.error_messages = json.dumps(error_data)
+            call.status_code = 'FAILED'
             call.save()
 
     def handle(self, *args, **options):
@@ -66,7 +71,6 @@ class Command(BaseCommand):
         channel = connection.channel()
         channel.queue_declare(queue='fuseplug_python', durable=True)
         def callback(ch, method, properties, body):
-#            self.print_body(body)
             message_body = body
             super_call_id = self.get_super_call_id(body)
             call = self.get_latest_call(super_call_id)
