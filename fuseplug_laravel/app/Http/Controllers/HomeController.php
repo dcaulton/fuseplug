@@ -171,6 +171,12 @@ This is what good post datalooks like for http_get:
     }
 
     public function mockPost(Request $request, $operation_id) {
+        $operation = Operation::findOrFail($operation_id);
+        $rule = OperationRule::where('operation_id', $operation_id)->first();
+        $action = OperationAction::where('operation_rule_id', $rule->id)->first();
+        if ($action->operation_type != 'mock') {return Response::json("Invalid Mock Operation id specified", 400);}
+        if ($action->http_verb != 'POST') {return Response::json("Invalid Mock Operation id specified, not a POST endpoint", 400);}
+
         $request_obj = $this->package_request_data($request);
         $response_data = $this->map_mock_data($request_obj, $operation_id);
         $this->sleep_if_needed($operation_id);
@@ -178,6 +184,12 @@ This is what good post datalooks like for http_get:
     }
 
     public function mockGet(Request $request, $operation_id) {
+        $operation = Operation::findOrFail($operation_id);
+        $rule = OperationRule::where('operation_id', $operation_id)->first();
+        $action = OperationAction::where('operation_rule_id', $rule->id)->first();
+        if ($action->operation_type != 'mock') {return Response::json("Invalid Mock Operation id specified", 400);}
+        if ($action->http_verb != 'GET') {return Response::json("Invalid Mock Operation id specified, not a GET endpoint", 400);}
+
         $request_obj = $this->package_request_data($request);
         $response_data = $this->map_mock_data($request_obj, $operation_id);
         $this->sleep_if_needed($operation_id);
