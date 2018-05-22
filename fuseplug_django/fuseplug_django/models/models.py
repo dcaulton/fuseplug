@@ -19,9 +19,9 @@ class Brand(models.Model):
 class Call(models.Model):
     operation_action = models.ForeignKey('OperationAction', models.DO_NOTHING)
     super_call = models.ForeignKey('SuperCall', models.DO_NOTHING)
-    request_data = models.CharField(max_length=255)
-    response_data = models.CharField(max_length=255, blank=True, null=True)
-    error_messages = models.CharField(max_length=255, blank=True, null=True)
+    request_data = models.CharField(max_length=1024)
+    response_data = models.CharField(max_length=4096, blank=True, null=True)
+    error_messages = models.CharField(max_length=4096, blank=True, null=True)
     debug_info = models.CharField(max_length=4096, blank=True, null=True)
     status_code = models.CharField(max_length=255)
     created_at = models.DateTimeField(blank=True, null=True)

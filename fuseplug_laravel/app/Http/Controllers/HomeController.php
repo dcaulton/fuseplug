@@ -17,6 +17,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Jobs\HttpJob;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Response;
 
 class HomeController extends Controller

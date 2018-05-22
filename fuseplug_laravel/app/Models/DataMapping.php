@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use App\Models\DataMappingDetail;
 
 class DataMapping extends Model
@@ -52,6 +53,10 @@ class DataMapping extends Model
     }
 
     public function transform($request_data, $operation_action) {
+        Log::debug("DataMapping.transform(): doing a ".$this->object_type_being_created." transform "); 
+        Log::debug("   with this data".$request_data);
+        Log::debug("   and this template ".$this->template);
+        Log::debug("   with this operation action ".$operation_action->id);
         $data_mapping_details = DataMappingDetail::where('data_mapping_id', $this->id)->orderBy('order')->get();
         $source_data = json_decode($request_data, true);
 
@@ -69,7 +74,7 @@ class DataMapping extends Model
             $replacement_selector = $this->build_target_selector($data_mapping_detail);
             $return_data = str_replace($replacement_selector, $replace_with_value, $return_data);
         }
-
+        Log::debug("   result is ".$return_data);
         return $return_data;
     }
 }
