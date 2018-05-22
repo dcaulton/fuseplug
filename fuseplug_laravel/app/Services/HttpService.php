@@ -80,13 +80,17 @@ class HttpService
         return $response;
     }
 
-    public static function getQueueName($operation, $action) {
+    public static function getQueueName($operation, $action, $super_call) {
         $queue_name = env('RABBITMQ_QUEUE', 'fuseplug');
         if (isset($operation->queue)) {
             $queue_name = $operation->queue;
         }
         if (isset($action->queue)) {
             $queue_name = $action->queue;
+        }
+        $sc_paylod = json_decode($super_call->initial_payload);
+        if (array_key_exists('queue_name', $sc_payload)) {
+            $queue_name = $sc_payload->queue_name;
         }
         return $queue_name;
     }
@@ -96,8 +100,6 @@ class HttpService
         $call = Call::where('super_call_id', $super_call_id)->orderBy('created_at', 'desc')->first();
         $action = OperationAction::find($call->operation_action_id);
         $rule = OperationRule::find($action->operation_rule_id);
-        $operation = Operation::find($rule->operation_id);
-        $queue_name = self::getQueueName($operation, $action);
         try {
             if ($action->http_verb == 'GET') {
                 $data = self::doGetRequest($action, $call);
@@ -116,6 +118,8 @@ class HttpService
 			// determine the next call and schedule it
 			$call = $super_call->get_next_call();
 			if ($call) {
+                $operation = Operation::find($rule->operation_id);
+                $queue_name = self::getQueueName($operation, $action, $super_call);
 				HttpJob::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
 			}
 

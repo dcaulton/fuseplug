@@ -63,10 +63,13 @@ This is what good post datalooks like for http_get:
         if (isset($operation->queue)) {
             $queue_name = $operation->queue;
         }
+        if (isset($control_data['queue_name'])) {
+            $queue_name = $control_data['queue_name'];
+        } 
 
         $get_parameters = $request->query();
 
-        $super_call_id = SuperCall::create($payload, $get_parameters, $operation->id);
+        $super_call_id = SuperCall::create($payload, $get_parameters, $control_data, $operation->id);
         $super_call = SuperCall::find($super_call_id);
         $call = $super_call->get_next_call();
         if ($call) {

@@ -34,7 +34,7 @@ function gen_uuid() {
 
 class SuperCall extends Model
 {
-    public static function create($payload, $get_parameters, $operation_id) {
+    public static function create($payload, $get_parameters, $control_data, $operation_id) {
         $super_call = new SuperCall;
         $super_call->operation_id = $operation_id;
 
@@ -45,6 +45,7 @@ class SuperCall extends Model
                 rawurldecode($payload_obj['get_parameters'][$get_parm_key]);
         }
         $payload_obj['payload'] = $payload;
+        $payload_obj['control_data'] = $control_data;
         $super_call->initial_payload = json_encode($payload_obj);
 
         $super_call->status = 'ACTIVE';

@@ -2,6 +2,11 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Operation;
+use App\Models\OperationRule;
+use App\Models\OperationAction;
+use App\Models\DataMapping;
+use App\Models\DataMappingDetail;
 
 class OperationsSeeder extends Seeder
 {
@@ -315,10 +320,10 @@ class OperationsSeeder extends Seeder
             'name' => 'credit_check_1op_cool_laravel',
             'queue' => 'fuseplug_laravel'
         ]);
-        $operation = DB::table('operations')->orderBy('id', 'desc')->first();
+        $laravel_cool_operation = DB::table('operations')->orderBy('id', 'desc')->first();
 
         DB::table('operation_rules')->insert([
-            'operation_id' => $operation->id,
+            'operation_id' => $laravel_cool_operation->id,
             'brand_version' => 'v3',
             'fuse_version' => '57',
             'order' => 1,
@@ -328,29 +333,29 @@ class OperationsSeeder extends Seeder
             'operator' => '=',
             'allowed_value' => 'special'
         ]);
-        $operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
+        $laravel_cool_operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
 
         DB::table('operation_actions')->insert([
-            'operation_rule_id' => $operation_rule->id,
+            'operation_rule_id' => $laravel_cool_operation_rule->id,
             'order' => 1,
             'name' => 'hurdaherr get to cool story bro',
             'operation_type' => 'http',
             'operation_source' => 'fuse',
             'http_verb' => 'GET'
         ]);
-        $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
+        $laravel_cool_operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
 
         DB::table('data_mappings')->insert([
-            'operation_action_id' => $operation_action->id,
+            'operation_action_id' => $laravel_cool_operation_action->id,
             'brand_versions' => 'v1,v2',
             'template' => 'http://foaas.com/cool/{from}',
             'object_type_being_created' => 'url',
             'fuse_versions' => '57-59'
         ]);
-        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
+        $laravel_cool_data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
 
         DB::table('data_mapping_details')->insert([
-            'data_mapping_id' => $data_mapping->id,
+            'data_mapping_id' => $laravel_cool_data_mapping->id,
             'order' => 1,
             'source_field' => 'from',
             'source_field_type' => 'payload',
@@ -358,7 +363,11 @@ class OperationsSeeder extends Seeder
             'target_data_type' => 'url',
             'default_value' => 'nobody you know'
         ]);
-        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+        $laravel_cool_data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+
+
+
+
 
         // live endpoint for laravel - one post to our mock that just echoes
         DB::table('operations')->insert([
