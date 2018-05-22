@@ -6,6 +6,7 @@ use App\Models\Call;
 use App\Models\OperationRule;
 use App\Models\OperationAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Uuid;
 
 
@@ -69,6 +70,16 @@ class SuperCall extends Model
             array_push($called_action_ids, $call->operation_action_id);
             $last_response = $call->response_data;
         }
+        if (is_string($last_response)) {
+            $last_response = json_decode($last_response);
+            if (!array_key_exists("payload", $last_response)) {
+            // TODO: If this is going to always be true, skip the need for an if
+            // massage the last response into the payload/get_parameters structure we use internally to store call data
+                $last_response = ["get_parameters"=>'', "payload"=> $last_response];
+            }
+        }
+        $last_response_string = json_encode($last_response);
+
         foreach ($rules as $rule) {
             if (!$rule->should_be_called($this, $calls)) {
                 continue;
@@ -79,12 +90,13 @@ class SuperCall extends Model
                     continue;
                 }
                 // else we have actions for this rule which haven't been performed yet, create a call for the first one!
-                $call_id = Call::create($this, $action, $last_response);
+                $call_id = Call::create($this, $action, $last_response_string);
                 return $call_id;
             }
         }
         // if no more calls, make this supercall complete, move the last calls payload to final_response
-        $this->final_response = $last_response;
+        $last_response_payload_string = json_encode($last_response['payload']);
+        $this->final_response = $last_response_payload_string;
         $this->status = 'COMPLETE';
         if (!$this->save()) {
             throw new \Exception('error finalizing supercall');

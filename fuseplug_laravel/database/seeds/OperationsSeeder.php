@@ -17,6 +17,8 @@ class OperationsSeeder extends Seeder
         $mock_brand = DB::table('brands')->orderBy('id', 'desc')->first();
 
 
+// TODO fix this when i have echo working
+$echo_post_mock_operation_id = 1
 
 
         // make mock endpoint for post
@@ -156,10 +158,10 @@ class OperationsSeeder extends Seeder
 
 
 
-        // live endpoint with one live get and a post against our mock endpoint
+        // live endpoint for laravel - one get to foaas anyway (2 parms) one post to a mock endpoint
         DB::table('operations')->insert([
             'brand_id' => $test_brand->id,
-            'name' => 'credit_check_laravel',
+            'name' => 'credit_check_2ops_laravel',
             'queue' => 'fuseplug_laravel'
         ]);
         $operation = DB::table('operations')->orderBy('id', 'desc')->first();
@@ -268,6 +270,119 @@ class OperationsSeeder extends Seeder
             'default_value' => 'many people speaking at once'
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+
+
+        // live endpoint for laravel - one get to foaas cool (1 parm)
+        DB::table('operations')->insert([
+            'brand_id' => $test_brand->id,
+            'name' => 'credit_check_1op_cool_laravel',
+            'queue' => 'fuseplug_laravel'
+        ]);
+        $operation = DB::table('operations')->orderBy('id', 'desc')->first();
+
+        DB::table('operation_rules')->insert([
+            'operation_id' => $operation->id,
+            'brand_version' => 'v3',
+            'fuse_version' => '57',
+            'order' => 1,
+            'acting_on' => 'request',
+            'do_always' => false,
+            'input_selector' => 'abc',
+            'operator' => '=',
+            'allowed_value' => 'special'
+        ]);
+        $operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
+
+        DB::table('operation_actions')->insert([
+            'operation_rule_id' => $operation_rule->id,
+            'order' => 1,
+            'name' => 'hurdaherr get to cool story bro',
+            'operation_type' => 'http',
+            'operation_source' => 'fuse',
+            'http_verb' => 'GET'
+        ]);
+        $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mappings')->insert([
+            'operation_action_id' => $operation_action->id,
+            'brand_versions' => 'v1,v2',
+            'template' => 'http://foaas.com/cool/{from}',
+            'object_type_being_created' => 'url',
+            'fuse_versions' => '57-59'
+        ]);
+        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 1,
+            'source_field' => 'from',
+            'source_field_type' => 'payload',
+            'target_field' => 'from',
+            'target_data_type' => 'url',
+            'default_value' => 'nobody you know'
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+
+        // live endpoint for laravel - one post to our mock that just echoes
+        DB::table('operations')->insert([
+            'brand_id' => $test_brand->id,
+            'name' => 'credit_check_1post_echo_laravel',
+            'queue' => 'fuseplug_laravel'
+        ]);
+        $operation = DB::table('operations')->orderBy('id', 'desc')->first();
+
+        DB::table('operation_rules')->insert([
+            'operation_id' => $operation->id,
+            'brand_version' => 'v3',
+            'fuse_version' => '57',
+            'order' => 1,
+            'acting_on' => 'request',
+            'do_always' => false,
+            'input_selector' => 'abc',
+            'operator' => '=',
+            'allowed_value' => 'special'
+        ]);
+        $operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
+
+        DB::table('operation_actions')->insert([
+            'operation_rule_id' => $operation_rule->id,
+            'order' => 1,
+            'name' => 'do a post to our local mock that just echoes back',
+            'operation_type' => 'http',
+            'operation_source' => 'fuse',
+            'http_verb' => 'POST'
+        ]);
+        $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mappings')->insert([
+            'operation_action_id' => $operation_action->id,
+            'brand_versions' => 'v1,v2',
+            'template' => 'localhost:8000/mock/' . $echo_post_mock_operation_id,
+            'object_type_being_created' => 'url',
+            'fuse_versions' => '57-59'
+        ]);
+        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mappings')->insert([
+            'operation_action_id' => $operation_action->id,
+            'brand_versions' => 'v1,v2',
+            'template' => '{"wickedness": "{from}"}',
+            'object_type_being_created' => 'payload',
+            'fuse_versions' => '57-59'
+        ]);
+        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mapping_details')->insert([
+            'data_mapping_id' => $data_mapping->id,
+            'order' => 1,
+            'source_field' => 'from',
+            'source_field_type' => 'payload',
+            'target_field' => 'from',
+            'target_data_type' => 'payload',
+            'default_value' => 'nobody you know'
+        ]);
+        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
+
 
 
 

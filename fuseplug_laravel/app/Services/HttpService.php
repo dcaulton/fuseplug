@@ -11,6 +11,7 @@ use App\Models\Operation;
 use App\Models\OperationAction;
 use App\Models\OperationRule;
 
+use Illuminate\Support\Facades\Log;
 class HttpService
 {
     public static function doGetRequest($action, $call) {
@@ -56,10 +57,9 @@ class HttpService
         if ($payload_data_mapping) {
             $payload = $payload_data_mapping->transform($call->request_data, $action);
         } 
-        $payload=json_decode($payload);
         $curl = curl_init($target_url);
         curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($payload));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             "Content-Type: application/json",
@@ -105,6 +105,10 @@ class HttpService
                 $data = self::doPostRequest($action, $call);
             }
              
+            if (strlen($data) > 4096) {
+                // TODO save this to a different table.  for now just truncate, this JSON will never parse again though!
+                $data = substr($data, 0, 4095);
+            }
             $call->response_data = $data;
             $call->status_code = 'COMPLETE';
             $call->save();
@@ -118,7 +122,11 @@ class HttpService
         } catch (\Exception $e) {
             $super_call->status = 'FAILED';
             $super_call->save();
-            $call->error_messages = $e->getMessage();
+            $error_messages = [$e->getMessage()];
+            $error_messages = array_merge($error_messages, $e->getTrace());
+            $error_messages = json_encode($error_messages);
+            $error_messages = substr($error_messages, 0, 4000);
+            $call->error_messages = $error_messages;
             $call->status_code = 'FAILED';
             $call->save();
         }
