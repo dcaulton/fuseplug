@@ -17,11 +17,48 @@ class OperationsSeeder extends Seeder
         $mock_brand = DB::table('brands')->orderBy('id', 'desc')->first();
 
 
-// TODO fix this when i have echo working
-$echo_post_mock_operation_id = 1
+        // make mock endpoint for post echo
+        DB::table('operations')->insert([
+            'brand_id' => $mock_brand->id,
+            'name' => 'mock_post_echo_endpoint'
+        ]);
+        $echo_post_mock_operation = DB::table('operations')->orderBy('id', 'desc')->first();
+
+        DB::table('operation_rules')->insert([
+            'operation_id' => $echo_post_mock_operation->id,
+            'brand_version' => 'dontcare',
+            'fuse_version' => 'dontcare',
+            'order' => 1,
+            'acting_on' => 'dontcare',
+            'do_always' => true,
+            'input_selector' => 'dontcare',
+            'operator' => '=',
+            'allowed_value' => 'dontcare'
+        ]);
+        $mock_post_operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
+
+        DB::table('operation_actions')->insert([
+            'operation_rule_id' => $mock_post_operation_rule->id,
+            'order' => 1,
+            'name' => 'mock_post_echo_operation_action',
+            'operation_type' => 'mock',
+            'operation_source' => 'dontcare',
+            'extra_parameters' => '{"sleep_time_min_milliseconds": "500", "sleep_time_max_milliseconds": "2000"}',
+            'http_verb' => 'POST'
+        ]);
+        $mock_post_operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
+
+        DB::table('data_mappings')->insert([
+            'operation_action_id' => $mock_post_operation_action->id,
+            'brand_versions' => 'dontcare',
+            'fuse_versions' => 'dontcare',
+            'object_type_being_created' => 'echo',
+            'template' => ''
+        ]);
+        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
 
 
-        // make mock endpoint for post
+        // make mock endpoint for post with mapping
         DB::table('operations')->insert([
             'brand_id' => $mock_brand->id,
             'name' => 'mock_post_endpoint'
@@ -357,7 +394,7 @@ $echo_post_mock_operation_id = 1
         DB::table('data_mappings')->insert([
             'operation_action_id' => $operation_action->id,
             'brand_versions' => 'v1,v2',
-            'template' => 'localhost:8000/mock/' . $echo_post_mock_operation_id,
+            'template' => 'localhost:8000/mock/' . $echo_post_mock_operation->id,
             'object_type_being_created' => 'url',
             'fuse_versions' => '57-59'
         ]);

@@ -179,6 +179,14 @@ This is what good post datalooks like for http_get:
         if ($action->http_verb != 'POST') {return Response::json("Invalid Mock Operation id specified, not a POST endpoint", 400);}
 
         $request_obj = $this->package_request_data($request);
+
+        $data_mapping = DataMapping::where('operation_action_id', $action->id)
+            ->where('object_type_being_created', 'echo')
+            ->first();
+        if ($data_mapping) { // its an echo request
+            $ro_pay = json_decode($request_obj);
+            return Response::json($ro_pay->payload, 200);
+        }
         $response_data = $this->map_mock_data($request_obj, $operation_id);
         $this->sleep_if_needed($operation_id);
         return Response::json($response_data, 200);
@@ -226,8 +234,8 @@ This is what good post datalooks like for http_get:
         return $response_data;
     }
 
-    private function package_request_data($request) {
-        $payload = $request->all();
+    private function package_request_data(Request $request) {
+        $payload = array_diff($request->all(), $request->query());
         $get_parameters = $request->query();
         $request_obj = Array();
         $request_obj['get_parameters'] = $get_parameters;

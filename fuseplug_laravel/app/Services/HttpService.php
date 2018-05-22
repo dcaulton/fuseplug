@@ -101,7 +101,7 @@ class HttpService
         try {
             if ($action->http_verb == 'GET') {
                 $data = self::doGetRequest($action, $call);
-            } else {
+            } elseif ($action->http_verb == 'POST') {
                 $data = self::doPostRequest($action, $call);
             }
              
