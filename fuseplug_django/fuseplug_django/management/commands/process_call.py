@@ -31,8 +31,26 @@ class Command(BaseCommand):
         return response.text
 
     def do_post_request(self, action, call):
-        print('doing post request')
-        return 'did a post request'
+        data_mapping = DataMapping.objects.filter(operation_action_id=action.id, object_type_being_created='url')[0]
+        target_url = data_mapping.transform(call.request_data, action)
+
+        data_mapping = DataMapping.objects.filter(operation_action_id=action.id, object_type_being_created='payload')[0]
+        payload = data_mapping.transform(call.request_data, action)
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        }
+        debug_data = {}
+        debug_data['called_url'] = target_url
+        debug_data['payload_to_url'] = payload
+
+        response = requests.post(target_url, headers=headers, data=payload)
+
+        debug_data['response_code'] = response.status_code
+        call.debug_info = json.dumps(debug_data)
+ 
+        return response.text
 
     def get_queue_name(self, options):
         return options['queue_name']
@@ -73,14 +91,6 @@ class Command(BaseCommand):
             call.save()
             super_call.status = 'FAILED'
             super_call.save()
-        
-    def print_body(self, body):
-        pprint.pprint('-------------------- new message --------------')
-        body_obj = json.loads(body)
-        pprint.pprint(body_obj)
-        pprint.pprint('--------data ------')
-        command_obj = body_obj['data']['command']
-        pprint.pprint(command_obj)
 
     def get_super_call_id(self, body):
         body_obj = json.loads(body)
@@ -92,37 +102,6 @@ class Command(BaseCommand):
             print('super_call_id is {0}'.format(super_call_id))
             return super_call_id
 
-    def get_latest_call(self, super_call_id):
-        calls = Call.objects.filter(super_call_id=super_call_id).order_by('-created_at')
-        if calls:
-            call = calls[0]
-            return call
-
-    def do_the_call(self, call):
-        target_url = 'http://foaas.com/cool/'
-        try:
-            initial_payload = json.loads(call.request_data)
-            from_name = 'Dave'
-            if 'from' in initial_payload['payload']:
-                from_name = initial_payload['payload']['from']
-            target_url += from_name
-            headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-            debug_data = {'called_url': target_url, 'payload_to_url': ''}
-            response = requests.get(target_url, headers=headers)
-            call.response_data = response.json() 
-            debug_data['response_code'] = response.status_code
-            call.debug_info = json.dumps(debug_data)
-            call.status_code='COMPLETE'
-            call.save()
-        except Exception as no_way:
-            error_data = {'message': str(no_way), 'error_class': no_way.__class__.__name__}
-            call.error_messages = json.dumps(error_data)
-            call.status_code = 'FAILED'
-            call.save()
-
     def handle(self, *args, **options):
         queue_name = self.get_queue_name(options)
         connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
@@ -130,24 +109,14 @@ class Command(BaseCommand):
         channel.queue_declare(queue=queue_name, durable=True)
         def callback(ch, method, properties, body):
             super_call_id = self.get_super_call_id(body)
-# NEW LOGIC
+
             self.process_request(super_call_id)
             super_call = SuperCall.objects.get(pk=super_call_id)
             call = super_call.get_next_call()
             if call:
                 print("right nere we will be requeueing the body on queue {0}".format(queue_name))
             exit()
-#### END NEW LOGIC
-# OLD LOGIC, REMOVE SOON
-#            call = self.get_latest_call(super_call_id)
-#            self.do_the_call(call)
-#
-#            if call.status_code == 'COMPLETE':
-#                super_call = SuperCall.objects.get(pk=super_call_id)
-#                call = super_call.get_next_call()
-#                if call:
-#                    print('get the queue info and dispatch the next call')
-##### END OLD LOGIC
+
             if options['run_once'] == 'true':
                 exit()
         channel.basic_consume(callback, queue=queue_name, no_ack=True)

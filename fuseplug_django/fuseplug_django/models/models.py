@@ -123,7 +123,6 @@ class DataMapping(models.Model):
         return_data = self.template
 
         for data_mapping_detail in data_mapping_details:
-            import pdb; pdb.set_trace()
             replace_with_value = self.get_replace_with_value(data_mapping_detail, source_data)
 
             if (data_mapping_detail.target_data_type == 'url'):
