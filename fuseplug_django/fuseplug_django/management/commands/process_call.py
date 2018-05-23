@@ -13,8 +13,22 @@ class Command(BaseCommand):
     help = 'processes a fuseplug call'
 
     def do_get_request(self, action, call):
-        print('doing get request')
-        return 'did a get request'
+        data_mapping = DataMapping.objects.filter(operation_action_id=action.id, object_type_being_created='url')[0]
+        target_url = data_mapping.transform(call.request_data, action)
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        }
+        debug_data = {}
+        debug_data['called_url'] = target_url
+        debug_data['payload_to_url'] = ''
+
+        response = requests.get(target_url, headers=headers)
+
+        debug_data['response_code'] = response.status_code
+        call.debug_info = json.dumps(debug_data)
+ 
+        return response.text
 
     def do_post_request(self, action, call):
         print('doing post request')
@@ -52,11 +66,13 @@ class Command(BaseCommand):
             call.save()
         except Exception as unfortunate:
             error_data = {'message': str(unfortunate), 'error_class': unfortunate.__class__.__name__}
-            super_call.status = 'FAILED'
-            super_call.save()
-            call.error_messages = json.dumps(error_data)
+            error_string = json.dumps(error_data) 
+            error_string += '------ TRACEBACK: ' + traceback.format_exc()
+            call.error_messages = error_string
             call.status_code = 'FAILED'
             call.save()
+            super_call.status = 'FAILED'
+            super_call.save()
         
     def print_body(self, body):
         pprint.pprint('-------------------- new message --------------')
@@ -123,14 +139,14 @@ class Command(BaseCommand):
             exit()
 #### END NEW LOGIC
 # OLD LOGIC, REMOVE SOON
-            call = self.get_latest_call(super_call_id)
-            self.do_the_call(call)
-
-            if call.status_code == 'COMPLETE':
-                super_call = SuperCall.objects.get(pk=super_call_id)
-                call = super_call.get_next_call()
-                if call:
-                    print('get the queue info and dispatch the next call')
+#            call = self.get_latest_call(super_call_id)
+#            self.do_the_call(call)
+#
+#            if call.status_code == 'COMPLETE':
+#                super_call = SuperCall.objects.get(pk=super_call_id)
+#                call = super_call.get_next_call()
+#                if call:
+#                    print('get the queue info and dispatch the next call')
 ##### END OLD LOGIC
             if options['run_once'] == 'true':
                 exit()

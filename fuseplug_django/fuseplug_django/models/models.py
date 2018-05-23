@@ -6,7 +6,10 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+import json
+import urllib.parse
+from datetime import datetime
+from django.conf import settings
 
 class Brand(models.Model):
     name = models.CharField(unique=True, max_length=255)
@@ -80,6 +83,57 @@ class DataMapping(models.Model):
         managed = False
         db_table = 'data_mappings'
 
+    def get_replace_with_value(self, data_mapping_detail, source_data):
+        replace_with_value = ''
+        if data_mapping_detail.default_value:
+            replace_with_value = data_mapping_detail.default_value
+
+        if data_mapping_detail.source_field_type == 'payload':
+
+            if (data_mapping_detail.source_field and
+                    source_data['payload'][data_mapping_detail.source_field]):
+                replace_with_value = source_data['payload'][data_mapping_detail.source_field]
+        elif data_mapping_detail.source_field_type == 'url':
+            if (data_mapping_detail.source_field and  
+                    source_data['get_parameters'][data_mapping_detail.source_field]):
+                replace_with_value = source_data['get_parameters'][data_mapping_detail.source_field]
+        else:
+            if data_mapping_detail.transform == 'php_format_date':
+                date_format_string = "%Y-%m-%d %H:%M:%S"
+                if not data_mapping_detail.target_format_string:
+                    date_format_string = data_mapping_detail.target_format_string
+                replace_with_value = datetime.now().strftime(date_format_string)
+ 
+            if (data_mapping_detail.transform == 'env_variable' and data_mapping_detail.source_field):
+                default_value = ''
+                if data_mapping_detail.default_value:
+                    default_value = data_mapping_detail.default_value
+                replace_with_value = getattr(settings, data_mapping_detail.source_field, default_value)
+        return replace_with_value
+
+    def build_target_selector(self, data_mapping_detail):
+        replacement_selector = 'BUFUDDLED aRACHNId'
+        if data_mapping_detail.target_field:
+            replacement_selector = '{' + data_mapping_detail.target_field + '}'
+        return replacement_selector
+
+    def transform(self, request_data, operation_action):
+        data_mapping_details = DataMappingDetail.objects.filter(data_mapping_id=self.id).order_by('order')
+        source_data = json.loads(request_data)
+        return_data = self.template
+
+        for data_mapping_detail in data_mapping_details:
+            import pdb; pdb.set_trace()
+            replace_with_value = self.get_replace_with_value(data_mapping_detail, source_data)
+
+            if (data_mapping_detail.target_data_type == 'url'):
+                if (data_mapping_detail.transform != 'env_variable'):
+                    replace_with_value = urllib.parse.quote(replace_with_value.encode('utf-8'))
+
+            replacement_selector = self.build_target_selector(data_mapping_detail)
+            return_data = return_data.replace(replacement_selector, replace_with_value)
+
+        return return_data
 
 class Migration(models.Model):
     migration = models.CharField(max_length=255)
@@ -172,8 +226,8 @@ class SampleResponseCriteria(models.Model):
 
 class SuperCall(models.Model):
     operation = models.ForeignKey(Operation, models.DO_NOTHING)
-    initial_payload = models.CharField(max_length=255)
-    final_response = models.CharField(max_length=255, blank=True, null=True)
+    initial_payload = models.CharField(max_length=4096)
+    final_response = models.CharField(max_length=4096, blank=True, null=True)
     status = models.CharField(max_length=255)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
