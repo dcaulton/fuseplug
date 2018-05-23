@@ -16,8 +16,8 @@ class CreateSuperCallsTable extends Migration
         Schema::create('super_calls', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('operation_id')->unsigned();
-            $table->string('initial_payload');
-            $table->string('final_response')->nullable();
+            $table->string('initial_payload', 4096);
+            $table->string('final_response', 4096)->nullable();
             $table->string('status');
             $table->timestamps();
 

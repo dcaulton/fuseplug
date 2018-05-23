@@ -403,7 +403,7 @@ class OperationsSeeder extends Seeder
         DB::table('data_mappings')->insert([
             'operation_action_id' => $operation_action->id,
             'brand_versions' => 'v1,v2',
-            'template' => 'localhost:8000/mock/' . $echo_post_mock_operation->id,
+            'template' => 'http://localhost:8000/mock/' . $echo_post_mock_operation->id,
             'object_type_being_created' => 'url',
             'fuse_versions' => '57-59'
         ]);

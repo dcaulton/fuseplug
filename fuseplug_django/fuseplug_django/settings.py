@@ -128,3 +128,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 DAVE='cool'
+TEST_CLIENT_ROOT_URL='http://foaas.com'
