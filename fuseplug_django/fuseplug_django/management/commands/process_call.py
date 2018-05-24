@@ -68,7 +68,7 @@ class Command(BaseCommand):
 
     def process_request(self, super_call_id):
         super_call = SuperCall.objects.get(pk=super_call_id)
-        call = Call.objects.filter(super_call_id=super_call.id).order_by('-created_at')[0]
+        call = Call.objects.filter(super_call_id=super_call.id).order_by('-id')[0]
         action = OperationAction.objects.get(pk=call.operation_action_id)
         rule = OperationRule.objects.get(pk=action.operation_rule_id)
         try:
@@ -114,8 +114,12 @@ class Command(BaseCommand):
             super_call = SuperCall.objects.get(pk=super_call_id)
             call = super_call.get_next_call()
             if call:
+                channel.stop_consuming()
+
+                channel.basic_publish(exchange=queue_name,
+                      routing_key=queue_name,
+                      body=body)
                 print("right nere we will be requeueing the body on queue {0}".format(queue_name))
-            exit()
 
             if options['run_once'] == 'true':
                 exit()
