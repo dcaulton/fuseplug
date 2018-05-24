@@ -89,13 +89,12 @@ class DataMapping(models.Model):
             replace_with_value = data_mapping_detail.default_value
 
         if data_mapping_detail.source_field_type == 'payload':
-
             if (data_mapping_detail.source_field and
                     source_data['payload'][data_mapping_detail.source_field]):
                 replace_with_value = source_data['payload'][data_mapping_detail.source_field]
         elif data_mapping_detail.source_field_type == 'url':
             if (data_mapping_detail.source_field and  
-                    source_data['get_parameters'][data_mapping_detail.source_field]):
+                    data_mapping_detail.source_field in source_data['get_parameters']):
                 replace_with_value = source_data['get_parameters'][data_mapping_detail.source_field]
         else:
             if data_mapping_detail.transform == 'php_format_date':
@@ -236,22 +235,38 @@ class SuperCall(models.Model):
         db_table = 'super_calls'
 
     def get_next_call(self):
-        calls = Call.objects.filter(super_call_id=self.id).order_by('-updated_at')
-        if calls:
-            last_response = calls[0].response_data
-            called_action_ids = [x.operation_action_id for x in calls]
         rules = OperationRule.objects.filter(operation_id=self.operation_id).order_by('order')
+        calls = Call.objects.filter(super_call_id=self.id).order_by('updated_at')
+        called_action_ids = []
+        last_response = self.initial_payload
+        for call in calls:
+            called_action_ids.append(call.operation_action_id)
+            last_response = call.response_data
+
+        if type(last_response) is str:
+            last_response = json.loads(last_response)
+            if "payload" not in last_response:
+                last_response = {"get_parameters":'', "payload": last_response}
+
+        last_response_string = json.dumps(last_response)
+
         for rule in rules:
-            if rule.should_be_called(self, calls):
-                actions = OperationAction.objects.filter(operation_rule_id=rule.id).order_by('order')
-                for action in actions:
-                    if action.id in called_action_ids:
-                        continue
-                    call = Call.create(self, action, last_response)
-                    return call.id
-        self.final_response = last_response
+            if not rule.should_be_called(self, calls):
+                continue
+
+            actions = OperationAction.objects.filter(operation_rule_id=rule.id).order_by('order')
+            for action in actions:
+                if action.id in called_action_ids:
+                    continue
+
+                call_id = Call.create(self, action, last_response_string)
+                return call_id
+
+        last_response_payload_string = json.dumps(last_response['payload'])
+        self.final_response = last_response_payload_string
         self.status = 'COMPLETE'
-        self.save()
+        if self.save():
+            raise Exception('error finalizing supercall')
 
 
 class User(models.Model):
