@@ -69,12 +69,24 @@ This is what good post datalooks like for http_get:
 
         $get_parameters = $request->query();
 
-        $super_call_id = SuperCall::create($payload, $get_parameters, $control_data, $operation->id);
-        $super_call = SuperCall::find($super_call_id);
-        $call = $super_call->get_next_call();
-        if ($call) {
-            HttpJob::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
+        if (array_key_exists('super_calls', $get_parameters)) {
+            foreach (range(1, $get_parameters['super_calls']) as $index) {
+                $super_call_id = SuperCall::create($payload, $get_parameters, $control_data, $operation->id);
+                $super_call = SuperCall::find($super_call_id);
+                $call = $super_call->get_next_call();
+                if ($call) {
+                    HttpJob::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
+                }
+            }
+        } else {
+            $super_call_id = SuperCall::create($payload, $get_parameters, $control_data, $operation->id);
+            $super_call = SuperCall::find($super_call_id);
+            $call = $super_call->get_next_call();
+            if ($call) {
+                HttpJob::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
+            }
         }
+
         return Response::json($super_call_id, 202); // return a 202 Accepted indicating it's going to run, check back later
     }
 

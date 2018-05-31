@@ -88,9 +88,9 @@ class HttpService
         if (isset($action->queue)) {
             $queue_name = $action->queue;
         }
-        $sc_paylod = json_decode($super_call->initial_payload);
-        if (array_key_exists('queue_name', $sc_payload)) {
-            $queue_name = $sc_payload->queue_name;
+        $sc_payload = json_decode($super_call->initial_payload);
+        if (array_key_exists('queue_name', $sc_payload->control_data)) {
+            $queue_name = $sc_payload->control_data->queue_name;
         }
         return $queue_name;
     }
@@ -116,8 +116,8 @@ class HttpService
             $call->save();
 
 			// determine the next call and schedule it
-			$call = $super_call->get_next_call();
-			if ($call) {
+			$next_call = $super_call->get_next_call();
+			if ($next_call) {
                 $operation = Operation::find($rule->operation_id);
                 $queue_name = self::getQueueName($operation, $action, $super_call);
 				HttpJob::dispatch($super_call_id)->onQueue($queue_name)->onConnection('rabbitmq');
@@ -130,9 +130,11 @@ class HttpService
             $error_messages = array_merge($error_messages, $e->getTrace());
             $error_messages = json_encode($error_messages);
             $error_messages = substr($error_messages, 0, 4000);
-            $call->error_messages = $error_messages;
-            $call->status_code = 'FAILED';
-            $call->save();
+            if ($call) {
+                $call->error_messages = $error_messages;
+                $call->status_code = 'FAILED';
+                $call->save();
+            }
         }
     }
 }

@@ -1,3 +1,5 @@
+from datetime import datetime
+import time
 import json
 import pprint
 import re
@@ -99,29 +101,28 @@ class Command(BaseCommand):
         match_object = re.search(id_regex, command_obj)
         if match_object:
             super_call_id = match_object.group(1)
-            print('super_call_id is {0}'.format(super_call_id))
             return super_call_id
 
     def handle(self, *args, **options):
         queue_name = self.get_queue_name(options)
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-        channel = connection.channel()
-        channel.queue_declare(queue=queue_name, durable=True)
+        connection_1 = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        channel_1 = connection_1.channel()
+        channel_1.queue_declare(queue=queue_name, durable=True)
         def callback(ch, method, properties, body):
             super_call_id = self.get_super_call_id(body)
-
+            print('processing {0} - {1}'.format(super_call_id, datetime.now()))
             self.process_request(super_call_id)
             super_call = SuperCall.objects.get(pk=super_call_id)
             call = super_call.get_next_call()
             if call:
-                channel.stop_consuming()
-
-                channel.basic_publish(exchange=queue_name,
+                channel_1.basic_publish(exchange=queue_name,
                       routing_key=queue_name,
                       body=body)
-                print("right nere we will be requeueing the body on queue {0}".format(queue_name))
+                print("requeueing")
 
+            print('done {0}'.format(datetime.now()))
             if options['run_once'] == 'true':
+                print('explicitly exiting')
                 exit()
-        channel.basic_consume(callback, queue=queue_name, no_ack=True)
-        channel.start_consuming()
+        channel_1.basic_consume(callback, queue=queue_name, no_ack=True)
+        channel_1.start_consuming()
