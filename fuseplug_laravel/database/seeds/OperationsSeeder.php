@@ -66,7 +66,7 @@ class OperationsSeeder extends Seeder
         // make mock endpoint for post with mapping
         DB::table('operations')->insert([
             'brand_id' => $mock_brand->id,
-            'name' => 'mock_post_endpoint'
+            'name' => 'mock_post_endpoint_1'
         ]);
         $mock_post_operation = DB::table('operations')->orderBy('id', 'desc')->first();
 
@@ -142,7 +142,7 @@ class OperationsSeeder extends Seeder
         // make mock endpoint for get
         DB::table('operations')->insert([
             'brand_id' => $mock_brand->id,
-            'name' => 'mock_get_endpoint'
+            'name' => 'mock_get_endpoint_1'
         ]);
         $mock_get_operation = DB::table('operations')->orderBy('id', 'desc')->first();
 
@@ -203,8 +203,8 @@ class OperationsSeeder extends Seeder
         // live endpoint for laravel - one get to foaas anyway (2 parms) one post to a mock endpoint
         DB::table('operations')->insert([
             'brand_id' => $test_brand->id,
-            'name' => 'credit_check_2ops_laravel',
-            'queue' => 'fuseplug_laravel'
+            'name' => 'credit_check_2ops',
+            'queue' => 'fuseplug'
         ]);
         $operation = DB::table('operations')->orderBy('id', 'desc')->first();
 
@@ -317,7 +317,7 @@ class OperationsSeeder extends Seeder
         // live endpoint for laravel - one get to foaas cool (1 parm)
         DB::table('operations')->insert([
             'brand_id' => $test_brand->id,
-            'name' => 'credit_check_1op_cool_laravel',
+            'name' => 'credit_check_1op_cool',
             'queue' => 'fuseplug_laravel'
         ]);
         $laravel_cool_operation = DB::table('operations')->orderBy('id', 'desc')->first();
@@ -372,7 +372,7 @@ class OperationsSeeder extends Seeder
         // live endpoint for laravel - one post to our mock that just echoes
         DB::table('operations')->insert([
             'brand_id' => $test_brand->id,
-            'name' => 'credit_check_1post_echo_laravel',
+            'name' => 'credit_check_1post_echo',
             'queue' => 'fuseplug_laravel'
         ]);
         $operation = DB::table('operations')->orderBy('id', 'desc')->first();
@@ -428,72 +428,6 @@ class OperationsSeeder extends Seeder
             'default_value' => 'nobody you know'
         ]);
         $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
-
-
-
-
-
-
-
-
-
-
-
-
-        DB::table('operations')->insert([
-            'brand_id' => $test_brand->id,
-            'name' => 'credit_check_python',
-            'queue' => 'fuseplug_python'
-        ]);
-        $operation = DB::table('operations')->orderBy('id', 'desc')->first();
-
-        DB::table('operation_rules')->insert([
-            'operation_id' => $operation->id,
-            'brand_version' => 'v2',
-            'fuse_version' => '58',
-            'order' => 1,
-            'acting_on' => 'request',
-            'do_always' => false,
-            'input_selector' => 'def',
-            'operator' => '=',
-            'allowed_value' => 'spe'
-        ]);
-        $operation_rule = DB::table('operation_rules')->orderBy('id', 'desc')->first();
-
-        DB::table('operation_actions')->insert([
-            'operation_rule_id' => $operation_rule->id,
-            'order' => 1,
-            'name' => 'send_stuff_to_whatever_python',
-            'operation_type' => 'http',
-            'operation_source' => 'fuse',
-            'http_verb' => 'GET'
-        ]);
-        $operation_action = DB::table('operation_actions')->orderBy('id', 'desc')->first();
-
-        DB::table('data_mappings')->insert([
-            'operation_action_id' => $operation_action->id,
-            'brand_versions' => 'v1,v2',
-            'template' => 'http://idontcare.com/see/if/i/care',
-            'fuse_versions' => '57-59'
-        ]);
-        $data_mapping = DB::table('data_mappings')->orderBy('id', 'desc')->first();
-
-        DB::table('data_mapping_details')->insert([
-            'data_mapping_id' => $data_mapping->id,
-            'order' => 1,
-            'source_field' => 'from',
-            'target_field' => 'from',
-            'target_data_type' => 'url',
-            'default_value' => 'somebody important'
-        ]);
-        $data_mapping_detail = DB::table('data_mapping_details')->orderBy('id', 'desc')->first();
-
-
-
-
-
-
-
 
     }
 }
